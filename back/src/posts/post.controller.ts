@@ -1,35 +1,58 @@
-import express from 'express';
-import Post from './post.interface';
+import express, { Response } from 'express';
+import Controller from '@interfaces/controller.interface';
+import Post from '@posts/post.interface';
+import postModel from '@posts/posts.model';
 
-class PostsController {
+class PostsController implements Controller {
     public path = "/posts";
     public router = express.Router();
-
-    public posts: Post[] = [
-        {
-            author: 'leemagnon',
-            content: '잼잼',
-            title: '꿀꿀'
-        }
-    ];
+    private post = postModel;
 
     constructor() {
         this.initializeRoutes();
     }
 
-    initializeRoutes() {
+    private initializeRoutes() {
         this.router.get(this.path, this.getAllPosts);
-        this.router.post(this.path, this.createAPost);
+        this.router.get(`${this.path}/:id`, this.getPostById);
+        this.router.post(this.path, this.createPost);
+        this.router.patch(`${this.path}/:id`, this.modifyPost);
+        this.router.delete(`${this.path}/:id`, this.deletePost);
     }
 
-    getAllPosts (req: express.Request, res: express.Response) {
-        res.send(this.posts);
+    private getAllPosts = async (req: express.Request, res: express.Response): Promise<Response> => {
+        const posts: Post[] = await this.post.find().exec();
+        return res.send(posts);
     }
 
-    createAPost (req: express.Request, res: express.Response) {
-        const post: Post = req.body;
-        this.posts.push(post);
+    private getPostById = async (req: express.Request, res: express.Response): Promise<Response> => {
+        const id = req.params.id;
+        const post: Post = await this.post.findById(id);
+        return res.send(post);
+    }
+
+    private createPost = async (req: express.Request, res: express.Response): Promise<void> => {
+        const postData: Post = req.body;
+        const createdPost = new this.post(postData);
+        const savedPost = await createdPost.save();
+        res.send(savedPost);
+    }
+
+    private modifyPost = async (req: express.Request, res: express.Response): Promise<void> => {
+        const id = req.params.id;
+        const postData: Post = req.body;
+        const post = await this.post.findByIdAndUpdate(id, postData, { new: true });
         res.send(post);
+    }
+
+    private deletePost = async (req: express.Request, res: express.Response) => {
+        const id = req.params.id;
+        const successResponse = await this.post.findByIdAndDelete(id);
+        if (successResponse) {
+            res.send(200);
+        } else {
+            res.send(404);
+        }
     }
 }
 
