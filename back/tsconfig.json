@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true, 
+        "sourceMap": true,
+        "target": "ES2017",
+        "strict": false,
+        "baseUrl": "./src",
+        "paths": { // import A from @src/hello.js -> 절대 경로처럼 import할 수 있다.
+            "@utils/*": ["utils/*"],
+        },
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
