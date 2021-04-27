@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "experimentalDecorators": true,
         "module": "commonjs",
         "moduleResolution": "node",
         "esModuleInterop": true, 
@@ -11,6 +12,8 @@
         "paths": { // import A from @src/hello.js -> 절대 경로처럼 import할 수 있다.
             "@utils/*": ["utils/*"],
             "@interfaces/*": ["interfaces/*"],
+            "@middleware/*": ["middleware/*"],
+            "@exceptions/*": ["exceptions/*"],
             "@posts/*": ["posts/*"],
         },
     },

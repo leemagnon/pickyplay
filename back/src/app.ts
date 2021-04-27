@@ -1,6 +1,7 @@
 import express from 'express';
 import 'dotenv/config';
 import mongoose from 'mongoose';
+import errorMiddleware from '@middleware/error.middleware';
 
 class App {
     public app: express.Application;
@@ -13,6 +14,7 @@ class App {
         this.connectToDatabase();
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
+        this.initializeErrorHandling();
     }
 
     public listen() {
@@ -24,6 +26,10 @@ class App {
     private initializeMiddlewares() {
         this.app.use(express.json());
         this.app.use(express.urlencoded({extended: false}));
+    }
+
+    private initializeErrorHandling() {
+        this.app.use(errorMiddleware);
     }
 
     private initializeControllers(controllers) {

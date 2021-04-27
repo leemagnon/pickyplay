@@ -5,4 +5,4 @@ interface Controller {
     router: Router;
 }
 
-export default Controller;
+export default Controller; 

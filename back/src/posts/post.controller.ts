@@ -1,7 +1,11 @@
-import express, { Response } from 'express';
+import express, { NextFunction, Response } from 'express';
 import Controller from '@interfaces/controller.interface';
 import Post from '@posts/post.interface';
 import postModel from '@posts/posts.model';
+import mongoose from 'mongoose';
+import PostNotFoundException from '@exceptions/PostNotFoundException';
+import validationMiddleware from '@middleware/validation.middleware';
+import CreatePostDto from '@posts/post.dto';
 
 class PostsController implements Controller {
     public path = "/posts";
@@ -15,8 +19,8 @@ class PostsController implements Controller {
     private initializeRoutes() {
         this.router.get(this.path, this.getAllPosts);
         this.router.get(`${this.path}/:id`, this.getPostById);
-        this.router.post(this.path, this.createPost);
-        this.router.patch(`${this.path}/:id`, this.modifyPost);
+        this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost);
+        this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
         this.router.delete(`${this.path}/:id`, this.deletePost);
     }
 
@@ -25,10 +29,17 @@ class PostsController implements Controller {
         return res.send(posts);
     }
 
-    private getPostById = async (req: express.Request, res: express.Response): Promise<Response> => {
+    private getPostById = async (req: express.Request, res: express.Response, next: NextFunction) => {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            res.send("Please provide valid id");
+        }
         const id = req.params.id;
         const post: Post = await this.post.findById(id);
-        return res.send(post);
+        if (post) {
+            res.send(post);
+        } else {
+            next(new PostNotFoundException(id));
+        }
     }
 
     private createPost = async (req: express.Request, res: express.Response): Promise<void> => {
@@ -38,20 +49,24 @@ class PostsController implements Controller {
         res.send(savedPost);
     }
 
-    private modifyPost = async (req: express.Request, res: express.Response): Promise<void> => {
+    private modifyPost = async (req: express.Request, res: express.Response, next: NextFunction) => {
         const id = req.params.id;
         const postData: Post = req.body;
         const post = await this.post.findByIdAndUpdate(id, postData, { new: true });
-        res.send(post);
+        if (post) {
+            res.send(post);
+        } else {
+            next(new PostNotFoundException(id));
+        }
     }
 
-    private deletePost = async (req: express.Request, res: express.Response) => {
+    private deletePost = async (req: express.Request, res: express.Response, next: NextFunction) => {
         const id = req.params.id;
         const successResponse = await this.post.findByIdAndDelete(id);
         if (successResponse) {
             res.send(200);
         } else {
-            res.send(404);
+            next(new PostNotFoundException(id));
         }
     }
 }
