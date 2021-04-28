@@ -15,6 +15,7 @@
             "@middleware/*": ["middleware/*"],
             "@exceptions/*": ["exceptions/*"],
             "@posts/*": ["posts/*"],
+            "@users/*": ["users/*"],
         },
     },
     "include": [
