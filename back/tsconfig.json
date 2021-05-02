@@ -14,6 +14,7 @@
             "@interfaces/*": ["interfaces/*"],
             "@middleware/*": ["middleware/*"],
             "@exceptions/*": ["exceptions/*"],
+            "@authentication/*": ["authentication/*"],
             "@posts/*": ["posts/*"],
             "@users/*": ["users/*"],
         },
