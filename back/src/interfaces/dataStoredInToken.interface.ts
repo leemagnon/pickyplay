@@ -1,4 +1,5 @@
 interface DataStoredInToken {
+    isSecondFactorAuthenticated: boolean;
     _id: string;
 }
 

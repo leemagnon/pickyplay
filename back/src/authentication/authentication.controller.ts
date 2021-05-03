@@ -1,20 +1,19 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import express, { Request, Response, NextFunction } from 'express';
-import UserWithThatEmailAlreadyExistsException from '@exceptions/UserWithThatEmailAlreadyExistsException';
-import WrongCredentialException from '@exceptions/WrongCredentialException';
 import Controller from '@interfaces/controller.interface';
-import TokenData from '@interfaces/tokenData.interface';
-import DataStoredInToken from '@interfaces/dataStoredInToken.interface';
-import validationMiddleware from '@middleware/validation.middleware';
 import CreateUserDto from '@users/user.dto';
-import userModel from '@users/user.model';
-import User from '@users/user.interface';
 import LogInDto from '@authentication/login.dto';
+import AuthenticationService from '@authentication/authentication.service';
+import validationMiddleware from '@middleware/validation.middleware';
+import RequestWithUser from '@interfaces/requestWithUser.interface';
+import userModel from '@users/user.model';
+import authMiddleware from '@middleware/auth.middleware';
+import WrongAuthenticationTokenException from '@exceptions/WrongAuthenticationTokenException';
+import TwoFactorAuthenticationDto from './twoFactorAuthentication.dto';
 
 class AuthenticationController implements Controller {
     public path = '/auth';
     public router = express.Router();
+    private authenticationService = new AuthenticationService();
     private user = userModel;
 
     constructor() {
@@ -24,43 +23,31 @@ class AuthenticationController implements Controller {
     private initializeRoutes() {
         this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
         this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
+        this.router.post(`${this.path}/2fa/authenticate`, validationMiddleware(TwoFactorAuthenticationDto), this.secondFactorAuthentication);
         this.router.post(`${this.path}/logout`, this.loggingOut);
     }
 
     private registration = async (req: Request, res: Response, next: NextFunction) => {
         const userData: CreateUserDto = req.body;
-        
-        if(await this.user.findOne({ email: userData.email })) { // 동일한 email을 가진 사용자가 존재하면
-            next(new UserWithThatEmailAlreadyExistsException(userData.email));
-        } else {
-            const hashedPassword = await bcrypt.hash(userData.password, 10);
-            const user = await this.user.create({
-                ...userData,
-                password: hashedPassword,
-            });
-            user.password = undefined;
-            const tokenData = this.createToken(user);
-            res.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
+        try {
+            const {
+                cookie,
+                user,
+            } = await this.authenticationService.register(userData);
+            res.setHeader('Set-Cookie', [cookie]);
             res.send(user);
+        } catch (error) {
+            next(error);
         }
     }
 
     private loggingIn = async (req: Request, res: Response, next: NextFunction) => {
         const logInData: LogInDto = req.body;
-
-        const user = await this.user.findOne({ email: logInData.email });
-        if (user) {
-            const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
-            if (isPasswordMatching) {
-                user.password = undefined;
-                const tokenData = this.createToken(user);
-                res.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
-                res.send(user);
-            } else {
-                next(new WrongCredentialException());
-            } 
-        } else {
-            next(new WrongCredentialException());
+        try {
+            const otpauthUrl = await this.authenticationService.loggingIn(logInData, res);
+            this.authenticationService.respondWithQRCode(res, otpauthUrl);
+        } catch (error) {
+            next(error);
         }
     }
 
@@ -69,19 +56,19 @@ class AuthenticationController implements Controller {
         res.send(200);
     }
 
-    private createCookie(tokenData: TokenData) {
-        return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`
-    }
-
-    private createToken(user: User): TokenData {
-        const expiresIn = 60 * 60; // an hour
-        const secret = process.env.JWT_SECRET;
-        const dataStoredInToken: DataStoredInToken = {
-            _id: user._id,
-        };
-        return {
-            expiresIn,
-            token: jwt.sign(dataStoredInToken, secret, { expiresIn }),
+    private secondFactorAuthentication = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const { twoFactorAuthenticationCode, email } = req.body;
+        const { isCodeValid, user } = await this.authenticationService.verifyTwoFactorAuthenticationCode(twoFactorAuthenticationCode, email);
+        if (isCodeValid) {
+            const tokenData = this.authenticationService.createToken(user, true);
+            user.password = undefined;
+            user.twoFactorAuthenticationCode = undefined;
+            res.setHeader('Set-Cookie', [this.authenticationService.createCookie(tokenData)]);
+            res.send({
+                user,
+            });
+        } else {
+            next(new WrongAuthenticationTokenException());
         }
     }
 }

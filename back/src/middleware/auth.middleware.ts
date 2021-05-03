@@ -8,15 +8,14 @@ import userModel from '@users/user.model';
 
 async function authMiddleware(req: RequestWithUser, res: Response, next: NextFunction) {
     const cookies = req.cookies;
-    console.log(cookies);
     if(cookies && cookies.Authorization) {
         const secret = process.env.JWT_SECRET;
         try {
             // 만약 토큰이 잘못됐거나 폐기됐으면 jwt.verify가 error를 던진다.
             const verificationResponse = jwt.verify(cookies.Authorization, secret) as DataStoredInToken;
-            const id = verificationResponse._id;
+            const { isSecondFactorAuthenticated, _id: id } = verificationResponse;
             const user = await userModel.findById(id);
-            if (user) {
+            if (isSecondFactorAuthenticated && user) {
                 req.user = user;
                 next();
             } else {

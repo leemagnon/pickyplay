@@ -7,7 +7,8 @@ interface User {
     address?: {
         street: string,
         city: string,
-    }
+    };
+    twoFactorAuthenticationCode: string;
 }
 
 export default User;
