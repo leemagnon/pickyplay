@@ -10,13 +10,13 @@
         "baseUrl": "./src",
         "outDir": "./dist",
         "paths": { // import A from @src/hello.js -> 절대 경로처럼 import할 수 있다.
-            "@utils/*": ["utils/*"],
             "@interfaces/*": ["interfaces/*"],
             "@middleware/*": ["middleware/*"],
             "@exceptions/*": ["exceptions/*"],
+            "@utils/*": ["utils/*"],
             "@authentication/*": ["authentication/*"],
-            "@posts/*": ["posts/*"],
             "@users/*": ["users/*"],
+            "@posts/*": ["posts/*"],
         },
     },
     "include": [

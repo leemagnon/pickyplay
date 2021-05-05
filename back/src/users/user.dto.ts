@@ -1,15 +1,14 @@
-import { IsString, IsOptional, ValidateNested } from 'class-validator';
+import { IsEmail, IsString, IsOptional, ValidateNested, MinLength, MaxLength, } from 'class-validator';
 import CreateAddressDto from '@users/address.dto';
 
 class CreateUserDto {
-    @IsString()
+    @IsEmail()
     public email: string;
 
     @IsString()
+    @MinLength(8)
+    @MaxLength(20)
     public password: string;
-
-    @IsString()
-    public nickname: string;
 
     @IsOptional()
     @ValidateNested()

@@ -1,7 +1,5 @@
 interface User {
     _id: string;
-    firstName: string;
-    lastName: string;
     email: string;
     password: string;
     address?: {
@@ -9,6 +7,10 @@ interface User {
         city: string,
     };
     twoFactorAuthenticationCode: string;
+    nickname: string;
+    profileImgUrl: string;
+    introWords: string;
+    isOnline: boolean;
 }
 
 export default User;

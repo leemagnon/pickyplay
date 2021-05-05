@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true, // import * as React from 'react' -import React from 'react'> 
+        "sourceMap": true,
+        "lib": ["ES2020", "DOM"],
+        "jsx": "react",
+        "module": "esnext",
+        "moduleResolution": "Node",
+        "target": "ES5",
+        "strict": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": { 
+            "@layouts/*": ["layouts/*"]
+        }
+    }
+}
