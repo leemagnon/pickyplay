@@ -1,0 +1,15 @@
+{
+    "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["prettier", "@typescript-eslint"],
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "prettier/prettier": "error",
+      "@typescript-eslint/indent": ["error", 2]
+    }
+  }

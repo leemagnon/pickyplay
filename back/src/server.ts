@@ -5,9 +5,6 @@ import validateEnv from '@utils/validateEnv';
 
 validateEnv();
 
-const app = new App([
-    new AuthenticationController(),
-    new PostsController(),
-], 5000);
+const app = new App([new AuthenticationController(), new PostsController()], 5000);
 
 app.listen();
