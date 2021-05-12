@@ -1,9 +1,12 @@
 import styled from 'styled-components';
 
 export const Background = styled.div`
+    position: relative;
     background-image: url('/img/login_bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
     width: 100%;
-    height: 100%;
+    height: 142%;
 `;
 
 export const Header = styled.div`
@@ -30,7 +33,7 @@ export const LogInBody = styled.div`
     position: absolute;
     top: 0;
     right: 0;
-    bottom: 0;
+    bottom: 55;
     left: 0;
     margin: auto;
     width: 460px;
@@ -108,4 +111,15 @@ export const SignUp = styled.div`
   font-weight: 600;
   text-align: end;
   margin-top: 32px;
+`;
+
+export const Footer = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 19%;
+  padding: 40px 60px;
+  background-color: rgba(0,0,0,.75);
+  color: #737373;
+  font-size: 17px;
 `;
