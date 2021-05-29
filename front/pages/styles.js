@@ -1,52 +1,52 @@
 import styled from 'styled-components';
 
 export const Background = styled.div`
-    position: relative;
-    background-image: url('/img/login_bg.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    width: 100%;
-    height: 142%;
+  position: relative;
+  background-image: url('/login_bg.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
 `;
 
 export const Header = styled.div`
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 14%;
-    border-bottom: transparent;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 14%;
+  border-bottom: transparent;
 `;
 
 export const Logo = styled.h1`
-    position: absolute;
-    top: -20px;
-    left: 27px;
-    color: white;
-    font-size: 45px;
-    & span {
-        color: #9400D3;
-    }
+  position: absolute;
+  top: -20px;
+  left: 27px;
+  color: white;
+  font-size: 45px;
+  & span {
+    color: #9400d3;
+  }
 `;
 
 export const LogInBody = styled.div`
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 55;
-    left: 0;
-    margin: auto;
-    width: 460px;
-    height: 500px;
-    padding: 30px 65px;
-    background-color: rgba(0,0,0,.75);
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 55;
+  left: 0;
+  margin: auto;
+  width: 460px;
+  height: 500px;
+  padding: 30px 65px;
+  background-color: rgba(0, 0, 0, 0.75);
 `;
 
 export const LoginText = styled.h1`
-    color: #fff;
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 30px;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 30px;
 `;
 
 export const Input = styled.input`
@@ -56,7 +56,7 @@ export const Input = styled.input`
   border-bottom-style: initial;
   box-sizing: border-box;
   margin: 0 0 20px;
-  margin-bottom: 37px; 
+  margin-bottom: 37px;
   width: 100%;
   color: #fff;
   padding: 16px;
@@ -66,13 +66,13 @@ export const Input = styled.input`
 
   &.error {
     border-bottom-style: solid;
-    border-bottom-color: #FFFF00;
+    border-bottom-color: #ffff00;
     margin-bottom: 5px;
   }
 `;
 
 export const InputError = styled.div`
-  color: #FFFF00;
+  color: #ffff00;
   margin-bottom: 32px;
 `;
 
@@ -117,9 +117,13 @@ export const Footer = styled.div`
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 19%;
-  padding: 40px 60px;
-  background-color: rgba(0,0,0,.75);
+  padding: 20px 40px;
+  background-color: rgba(0, 0, 0, 0.75);
   color: #737373;
   font-size: 17px;
 `;
+
+export const aTagStyle = {
+  textDecoration: 'none',
+  color: '#fff',
+};
