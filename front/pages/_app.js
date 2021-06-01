@@ -1,7 +1,7 @@
 /**
  * 모든 페이지에서 공통인 것은 _app.js에 넣는다. pages들의 공통 부분.
  */
-
+import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head'; // head를 수정할 수 있게 Head 컴포넌트 제공
 import 'antd/dist/antd.css'; // 웹팩이 알아서 style 태그로 변경해서 처리해줌.
