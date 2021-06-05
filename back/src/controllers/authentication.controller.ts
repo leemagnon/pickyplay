@@ -1,13 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Controller from '@interfaces/controller.interface';
-import CreateUserDto from '@users/user.dto';
-import LogInDto from '@authentication/login.dto';
-import AuthenticationService from '@authentication/authentication.service';
-import validationMiddleware from '@middleware/validation.middleware';
+import CreateUserDto from '@dtos/user.dto';
+import LogInDto from '@dtos/login.dto';
+import SecondAuthDto from '@dtos/secondAuth.dto';
+import AuthenticationService from 'services/authentication.service';
 import RequestWithUser from '@interfaces/requestWithUser.interface';
 import authMiddleware from '@middleware/auth.middleware';
 import WrongAuthenticationTokenException from '@exceptions/WrongAuthenticationTokenException';
-import TwoFactorAuthenticationDto from './twoFactorAuthentication.dto';
 
 class AuthenticationController implements Controller {
   public path = '/auth';
@@ -19,13 +18,9 @@ class AuthenticationController implements Controller {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
-    this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
-    this.router.post(
-      `${this.path}/2fa/authenticate`,
-      validationMiddleware(TwoFactorAuthenticationDto),
-      this.secondFactorAuthentication,
-    );
+    this.router.post(`${this.path}/register`, this.registration);
+    this.router.post(`${this.path}/login`, this.loggingIn);
+    this.router.post(`${this.path}/2fa/authenticate`, this.secondFactorAuthentication);
     this.router.post(`${this.path}/logout`, authMiddleware, this.loggingOut);
   }
 
@@ -35,6 +30,7 @@ class AuthenticationController implements Controller {
       const user = await this.authenticationService.register(userData);
       res.send(user);
     } catch (error) {
+      console.error(error);
       next(error);
     }
   };
@@ -45,16 +41,14 @@ class AuthenticationController implements Controller {
       const otpauthUrl = await this.authenticationService.loggingIn(logInData, res);
       this.authenticationService.respondWithQRCode(res, otpauthUrl);
     } catch (error) {
+      console.error(error);
       next(error);
     }
   };
 
   private secondFactorAuthentication = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-    const { twoFactorAuthenticationCode, email } = req.body;
-    const { isCodeValid, user } = await this.authenticationService.verifyTwoFactorAuthenticationCode(
-      twoFactorAuthenticationCode,
-      email,
-    );
+    const secondAuthData: SecondAuthDto = req.body;
+    const { isCodeValid, user } = await this.authenticationService.verifyTwoFactorAuthenticationCode(secondAuthData);
     if (isCodeValid) {
       const tokenData = this.authenticationService.createToken(user, true);
       user.password = undefined;

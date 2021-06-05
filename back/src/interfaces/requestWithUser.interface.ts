@@ -1,8 +1,8 @@
-import { Request } from "express";
-import User from "@users/user.interface";
+import { Request } from 'express';
+import User from '@interfaces/user.interface';
 
 interface RequestWithUser extends Request {
-    user: User;
+  user: User;
 }
 
 export default RequestWithUser;

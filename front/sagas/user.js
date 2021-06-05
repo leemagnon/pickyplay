@@ -1,4 +1,5 @@
-import { all, fork, takeLatest, delay, put } from '@redux-saga/core/effects';
+import { all, fork, takeLatest, put, call } from '@redux-saga/core/effects';
+import axios from 'axios';
 import {
   LOG_IN_REQUEST,
   LOG_IN_SUCCESS,
@@ -15,18 +16,13 @@ function logInAPI(data) {
   return axios.post('/auth/login', data); // 서버로 요청을 보내는 코드
 }
 
-// function logOutAPI() {
-//   return axios.post('/api/logout');
-// }
-
 function* logIn(action) {
   try {
     console.log('saga 실행됨', action.data);
-    // const result = yield call(logInAPI, action.data);
-    yield delay(1000);
+    const result = yield call(logInAPI, action.data);
     yield put({
       type: LOG_IN_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -36,10 +32,13 @@ function* logIn(action) {
   }
 }
 
+function logOutAPI() {
+  return axios.post('/api/logout');
+}
+
 function* logOut() {
   try {
-    //const result = yield call(logOutAPI);
-    yield delay(1000);
+    yield call(logOutAPI);
     yield put({
       type: LOG_OUT_SUCCESS,
     });
@@ -51,12 +50,16 @@ function* logOut() {
   }
 }
 
+function signUpAPI() {
+  return axios.post('/api/logout');
+}
+
 function* signUp() {
   try {
-    //const result = yield call(signUpAPI);
-    yield delay(1000);
+    const result = yield call(signUpAPI);
     yield put({
       type: SIGN_UP_SUCCESS,
+      data: result.data,
     });
   } catch (err) {
     yield put({

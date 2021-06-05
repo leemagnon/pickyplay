@@ -1,7 +1,7 @@
-import useInput from '../hooks/useInput';
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Link from 'next/link';
+import useInput from '../hooks/useInput';
 import { LOG_IN_REQUEST } from '../reducers/user';
 import {
   Background,

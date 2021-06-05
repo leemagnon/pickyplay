@@ -1,20 +1,28 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import express from 'express';
 import 'dotenv/config';
-import mongoose from 'mongoose';
 import errorMiddleware from '@middleware/error.middleware';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import DB from './models';
+import path from 'path';
 
 class App {
   public app: express.Application;
   public port: number;
+  public db: DB;
 
   constructor(controllers, port: number) {
     this.app = express();
     this.port = port;
+    this.db = new DB();
 
-    this.connectToDatabase();
+    this.db.sequelize
+      .sync()
+      .then(() => {
+        console.log('mysql DB 연결 성공');
+      })
+      .catch(console.error);
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
     this.initializeErrorHandling();
@@ -22,6 +30,7 @@ class App {
 
   public listen() {
     this.app.listen(this.port, () => {
+      console.log(path.resolve(__dirname, 'config', 'config.ts'));
       console.log(`App listening on the port ${this.port}`);
     });
   }
@@ -40,15 +49,6 @@ class App {
   private initializeControllers(controllers) {
     controllers.forEach((controller) => {
       this.app.use('/', controller.router);
-    });
-  }
-
-  private connectToDatabase() {
-    const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
-
-    mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     });
   }
 }

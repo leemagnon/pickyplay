@@ -1,10 +1,9 @@
 import App from './app';
-import PostsController from '@posts/post.controller';
-import AuthenticationController from '@authentication/authentication.controller';
+import AuthenticationController from 'controllers/authentication.controller';
 import validateEnv from '@utils/validateEnv';
 
 validateEnv();
 
-const app = new App([new AuthenticationController(), new PostsController()], 5000);
+const app = new App([new AuthenticationController()], 5000);
 
 app.listen();
