@@ -33,7 +33,9 @@
   "dependencies": {
     "@types/qrcode": "1.4.0",
     "@types/speakeasy": "2.0.5",
+    "axios": "0.21.1",
     "bcrypt": "5.0.1",
+    "circular-json": "0.5.9",
     "class-validator": "0.13.1",
     "cookie-parser": "1.4.5",
     "dotenv": "8.2.0",
