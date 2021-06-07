@@ -4,3 +4,12 @@
 .font-nanum-gothic {
     font-family: 'Nanum Gothic', sans-serif;
 }
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover, a:active {
+    color: rgb(247, 247, 247);
+}
