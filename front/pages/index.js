@@ -2,15 +2,74 @@ import React from 'react';
 import styled from 'styled-components';
 import AppLayout from '../components/AppLayout';
 
-const PosterImg = styled.div`
+const Contents = styled.div`
   width: 100%;
-  height: 30%;
-  background-image: url('/login_bg.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  flex: 9;
 `;
 
-const Home = () => <AppLayout><div style={{ width: '100%', height: '100%', backgroundColor: 'black' }}>movies<PosterImg /></div></AppLayout>;
+const Home = () => (
+  <AppLayout isMainPage>
+    <Contents>
+      <div>sssssss</div>
+      <div>sssssss</div>
+      <div>sssssss</div>
+      <div>sssssss</div>
+      <div>sssssss</div>
+      <div>sssssss</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>asd</div>
+      <div>ddd</div>
+      <div>ddd</div>
+      <div>ddd</div>
+      <div>ddd</div><div>duuu</div><div>uuu</div><div>uuu</div><div>uuu</div><div>dduuuud</div>
+    </Contents>
+  </AppLayout>
+);
 
 export default Home;
 
