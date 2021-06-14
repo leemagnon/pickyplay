@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useCallback, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import useInput from '../../hooks/useInput';
-import { LOG_IN_REQUEST } from '../../reducers/user';
+import { LOAD_QR_CODE_REQUEST } from '../../reducers/user';
 import {
   Background,
   Header,
@@ -20,15 +20,22 @@ import {
 /* 로그인 컴포넌트 */
 const LogIn = () => {
   const dispatch = useDispatch();
+  const { loadQRCodeError } = useSelector((state) => state.user);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
   const IsEmailError = true;
   const IsPasswordError = false;
 
+  useEffect(() => {
+    if (loadQRCodeError) {
+      alert(loadQRCodeError);
+    }
+  }, [loadQRCodeError]);
+
   const onSubmit = useCallback(() => {
     console.log(email, password);
     dispatch({
-      type: LOG_IN_REQUEST,
+      type: LOAD_QR_CODE_REQUEST,
       data: { email, password },
     });
   }, [email, password]);
@@ -55,6 +62,7 @@ const LogIn = () => {
             value={email}
             onChange={onChangeEmail}
             placeholder="이메일 주소"
+            required
           />
           {IsEmailError && (
             <InputError className="font-nanum-gothic">
@@ -69,6 +77,7 @@ const LogIn = () => {
             value={password}
             onChange={onChangePassword}
             placeholder="비밀번호"
+            required
           />
           {IsPasswordError && (
             <InputError className="font-nanum-gothic">

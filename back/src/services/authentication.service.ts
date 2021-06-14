@@ -6,6 +6,7 @@ import userModel from 'models/user.model';
 import CreateUserDto from '@dtos/user.dto';
 import LogInDto from '@dtos/login.dto';
 import SecondAuthDto from '@dtos/secondAuth.dto';
+import EmailDto from '@dtos/email.dto';
 import User from '@interfaces/user.interface';
 import TokenData from '@interfaces/tokenData.interface';
 import DataStoredInToken from '@interfaces/dataStoredInToken.interface';
@@ -14,6 +15,7 @@ import WrongCredentialException from '@exceptions/WrongCredentialException';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import { Response } from 'express';
+import nodemailer from 'nodemailer';
 
 class AuthenticationService {
   public user = userModel;
@@ -27,6 +29,37 @@ class AuthenticationService {
       user.password = undefined;
       return user;
     }
+  }
+
+  public async sendEmailForAuthenticatiion(emailData: EmailDto) {
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      host: 'smtp.gmail.com',
+      auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SENDER_PASSWORD,
+      },
+    });
+
+    const mailOpt = {
+      from: process.env.SENDER_EMAIL,
+      to: emailData.receiverEmail,
+      subject: '🟪 가입 인증을 진행해주세요 🟪',
+      html: `👻 PICKYPLAY 서비스를 이용해 주셔서 감사합니다💜<br> 
+      아래 번호를 입력하시면 가입 인증이 이루어집니다.<br>
+      <b>${emailData.emailAuthCode}</b><br>
+      이메일 인증이 완료되어야 정상적으로 가입 진행이 가능합니다.<br>`,
+    };
+
+    await transporter.sendMail(mailOpt, (error) => {
+      if (error) {
+        throw error;
+      } else {
+        console.log(`Email has been sent.`);
+      }
+    });
+
+    transporter.close();
   }
 
   public async loggingIn(logInData: LogInDto, res: Response) {

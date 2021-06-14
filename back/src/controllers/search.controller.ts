@@ -22,6 +22,7 @@ class SearchController implements Controller {
   private initializeRoutes() {
     this.router.post(`${this.path}/store`, this.storeMovies);
     this.router.get(`${this.path}/randomMovie`, this.getRandomMovie);
+    this.router.get(`${this.path}/movie/:term`, this.searchMovies);
   }
 
   private storeMovies = async (req: Request, res: Response, next: NextFunction) => {
@@ -60,7 +61,7 @@ class SearchController implements Controller {
       index: 'movies-1',
       body: {
         size: 9,
-        _source: ['title._cdata', 'stlls._cdata', 'plots.plot.plotText._cdata'],
+        _source: ['DOCID._cdata', 'title._cdata', 'stlls._cdata', 'plots.plot.plotText._cdata'],
         query: {
           bool: {
             must_not: [
@@ -90,9 +91,62 @@ class SearchController implements Controller {
       result = result.hits.hits.filter((doc) => doc._source.stlls._cdata !== '  ');
 
       // 첫번째 도큐먼트의 stll url string 배열로 만들어준 후 응답.
+      result[0]._source.DOCID._cdata = result[0]._source.DOCID._cdata.trim();
       result[0]._source.stlls._cdata = result[0]._source.stlls._cdata.trim().split('|');
 
       res.status(200).json(result[0]);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private searchMovies = async (req: Request, res: Response, next: NextFunction) => {
+    const term = req.params.term;
+    const params = {
+      index: 'movies-1',
+      body: {
+        size: 50,
+        _source: [
+          'DOCID._cdata',
+          'posters._cdata',
+          'title._cdata',
+          'keywords._cdata',
+          'genre._cdata',
+          'actors.actor.actorNm._cdata',
+        ],
+        query: {
+          bool: {
+            should: [
+              {
+                term: { 'title._cdata': `${term}` },
+              },
+              {
+                term: { 'keywords._cdata': `${term}` },
+              },
+              {
+                term: { 'genre._cdata': `${term}` },
+              },
+              {
+                term: { 'actors.actor.actorNm._cdata': `${term}` },
+              },
+              {
+                term: { 'plots.plot.plotText._cdata': `${term}` },
+              },
+            ],
+          },
+        },
+      },
+    };
+
+    try {
+      let result = await this.client.search(params);
+      result = result.hits.hits;
+      for (const doc of result) {
+        doc._source.posters._cdata = doc._source.posters._cdata.trim().split('|')[0];
+      }
+
+      res.status(200).json(result);
     } catch (error) {
       console.error(error);
       next(error);

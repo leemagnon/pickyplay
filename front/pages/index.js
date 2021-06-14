@@ -10,7 +10,7 @@ const Contents = styled.div`
 `;
 
 const Home = () => (
-  <AppLayout isMainPage>
+  <AppLayout>
     <Contents>
       <div>sssssss</div>
       <div>sssssss</div>

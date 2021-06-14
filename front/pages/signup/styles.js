@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Form } from 'antd';
+import { Form, Input } from 'antd';
 
 export const Background = styled.div`
   position: relative;
@@ -7,22 +7,6 @@ export const Background = styled.div`
   width: 100%;
   height: 100%;
 `;
-
-// export const Logo = styled.h1`
-//   position: absolute;
-//   top: 20%;
-//   left: 50%;
-//   -o-transform: translate(-50%, -50%);
-//   -ms-transform: translate(-50%, -50%);
-//   -moz-transform: translate(-50%, -50%);
-//   -webkit-transform: translate(-50%, -50%);
-//   transform: translate(-50%, -50%);
-//   color: white;
-//   font-size: 45px;
-//   & span {
-//     color: #9400d3;
-//   }
-// `;
 
 export const Logo = styled.h1`
   position: absolute;
@@ -57,4 +41,21 @@ export const LoginForm = styled(Form)`
     height: 40px;
     margin-bottom: 20px;
   }
+`;
+
+export const InputField = styled(Input)`
+  background: #1d2428;
+  border-radius: 4px;
+  color: #fff;
+  &.error {
+    margin-bottom: 5px;
+    border-bottom-style: solid;
+    border-bottom-color: #ffff00;
+    border-bottom-width: 5px;
+  }
+`;
+
+export const InputError = styled.div`
+  color: #ffff00;
+  margin-bottom: 32px;
 `;
