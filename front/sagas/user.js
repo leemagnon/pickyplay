@@ -96,8 +96,9 @@ function* loadQRCode(action) {
   }
 }
 
-function signUpAPI() {
-  return axios.post('/api/register');
+function signUpAPI(data) {
+  console.log('signUpAPI 데이터 : ', data);
+  return axios.post('/auth/register', data);
 }
 
 function* signUp(action) {

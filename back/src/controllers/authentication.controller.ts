@@ -28,6 +28,7 @@ class AuthenticationController implements Controller {
   }
 
   private registration = async (req: Request, res: Response, next: NextFunction) => {
+    console.log('req.body : ', req.body);
     const userData: CreateUserDto = req.body;
     try {
       const user = await this.authenticationService.register(userData);

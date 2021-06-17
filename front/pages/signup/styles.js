@@ -23,7 +23,7 @@ export const Logo = styled.h1`
   }
 `;
 
-export const LoginForm = styled(Form)`
+export const SignUpForm = styled(Form)`
   position: absolute;
   width: 510px;
   height: 300px;

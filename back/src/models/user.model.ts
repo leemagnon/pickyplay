@@ -1,13 +1,25 @@
 import bcrypt from 'bcrypt';
-import { Model, DataType, Unique, IsEmail, Column, Length, BeforeUpdate, BeforeCreate } from 'sequelize-typescript';
+import {
+  Model,
+  DataType,
+  Unique,
+  IsEmail,
+  Column,
+  Length,
+  BeforeUpdate,
+  BeforeCreate,
+  AllowNull,
+} from 'sequelize-typescript';
 
 export default class User extends Model {
   @IsEmail
   @Unique
+  @AllowNull(false)
   @Column(DataType.STRING(30))
   email: string;
 
   @Length({ min: 8, max: 20 })
+  @AllowNull(false)
   @Column
   password: string;
 

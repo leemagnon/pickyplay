@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'antd';
-import useInput from '../../hooks/useInput';
-import { Background, Logo, LoginForm, InputField, InputError } from './styles';
+import { Background, Logo, SignUpForm, InputField, InputError } from './styles';
 import { GET_EMAIL_AUTH_CODE_REQUEST, SIGN_UP_REQUEST } from '../../reducers/user';
 
 const Signup = () => {
@@ -15,13 +14,21 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [emailRequiredError, setEmailRequiredError] = useState(false);
   const [emailValidationError, setEmailValidationError] = useState(false);
-  const [password, onChangePassword] = useInput('');
+  const [userEmailAuthCode, setUserEmailAuthCode] = useState(''); // 사용자가 입력한 인증 번호
+  const [userEmailAuthCodeRequiredError, setUserEmailAuthCodeRequiredError] = useState(false);
+  const [userEmailAuthCodeValidationError, setUserEmailAuthCodeValidationError] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordRequiredError, setPasswordRequiredError] = useState(false);
   const [passwordCheck, setPasswordCheck] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
+  const [passwordCheckRequiredError, setPasswordCheckRequiredError] = useState(false);
+  const [passwordCheckError, setPasswordCheckError] = useState(false);
+  const reg = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
 
   // 클래스 명
   const EmailInput = emailRequiredError || emailValidationError ? 'error' : null;
-  const PasswordInput = passwordError ? 'error' : null;
+  const UserEmailAuthCodeInput = userEmailAuthCodeRequiredError || userEmailAuthCodeValidationError ? 'error' : null;
+  const PasswordCheckInput = passwordCheckRequiredError || passwordCheckError ? 'error' : null;
+  const PasswordInput = passwordRequiredError ? 'error' : null;
 
   const getEmailAuthCode = useCallback(
     () => {
@@ -38,31 +45,106 @@ const Signup = () => {
   );
 
   const onChangeEmail = useCallback((e) => {
+    console.log('e.target.value : ', e.target.value);
+    console.log('email : ', email);
+
     setEmail(e.target.value);
-    setEmailRequiredError(e.target.value === '');
 
     if (e.target.value !== '') {
-      const reg = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+      setEmailRequiredError(false);
       setEmailValidationError(!reg.test(e.target.value));
     } else {
+      setEmailRequiredError(true);
       setEmailValidationError(false);
     }
-  }, [password]);
+  }, []);
+
+  const onChangeUserEmailAuthCode = useCallback((e) => {
+    console.log('e.target.value : ', e.target.value);
+    console.log('userEmailAuthCode : ', userEmailAuthCode);
+    setUserEmailAuthCode(e.target.value);
+
+    if (e.target.value !== '') {
+      setUserEmailAuthCodeRequiredError(false);
+    }
+  }, []);
+
+  const onChangePassword = useCallback((e) => {
+    console.log('e.target.value : ', e.target.value);
+    console.log('password : ', password);
+
+    setPassword(e.target.value);
+
+    if (e.target.value !== '') {
+      setPasswordRequiredError(false);
+    }
+  }, []);
 
   const onChangePasswordCheck = useCallback((e) => {
+    console.log('e.target.value : ', e.target.value);
+    console.log('passwordCheck : ', passwordCheck);
+
     setPasswordCheck(e.target.value);
-    setPasswordError(e.target.value !== password);
+    setPasswordCheckError(e.target.value !== password);
+
+    if (e.target.value !== '') {
+      setPasswordCheckRequiredError(false);
+    }
   }, [password]);
 
-  /**
-   * 여기서부터 다시 보기 => 회원가입 제출
-   */
   const onSubmit = useCallback(() => {
-    if (password !== passwordCheck) {
-      return setPasswordError(true);
+    if (email === '') {
+      console.log('email : ', email);
+      console.log('userEmailAuthCode : ', userEmailAuthCode);
+      console.log('password : ', password);
+      console.log('passwordCheck : ', passwordCheck);
+      setEmailValidationError(false);
+      return setEmailRequiredError(true);
     }
 
-    console.log(email, password);
+    if (userEmailAuthCode === '') {
+      console.log('email : ', email);
+      console.log('userEmailAuthCode : ', userEmailAuthCode);
+      console.log('password : ', password);
+      console.log('passwordCheck : ', passwordCheck);
+      setUserEmailAuthCodeValidationError(false);
+      return setUserEmailAuthCodeRequiredError(true);
+    }
+
+    if (password === '') {
+      console.log('email : ', email);
+      console.log('userEmailAuthCode : ', userEmailAuthCode);
+      console.log('password : ', password);
+      console.log('passwordCheck : ', passwordCheck);
+      return setPasswordRequiredError(true);
+    }
+
+    if (password !== '' && passwordCheck === '') {
+      console.log('passwordCheck : ', passwordCheck); console.log('email : ', email);
+      console.log('userEmailAuthCode : ', userEmailAuthCode);
+      console.log('password : ', password);
+      console.log('passwordCheck : ', passwordCheck);
+      setPasswordCheckError(false);
+      return setPasswordCheckRequiredError(true);
+    }
+
+    if (email !== '' && !reg.test(email)) {
+      setEmailRequiredError(false);
+      return setEmailValidationError(true);
+    }
+
+    if (emailAuthCode !== userEmailAuthCode) {
+      setUserEmailAuthCodeRequiredError(false);
+      return setUserEmailAuthCodeValidationError(true);
+    }
+
+    if (password !== passwordCheck) {
+      setPasswordCheckRequiredError(false);
+      return setPasswordCheckError(true);
+    }
+
+    console.log(email, password, userEmailAuthCode, passwordCheck);
+
     dispatch({
       type: SIGN_UP_REQUEST,
       data: { email, password },
@@ -77,7 +159,7 @@ const Signup = () => {
         <span>P</span>
         LAY
       </Logo>
-      <LoginForm onFinish={onSubmit}>
+      <SignUpForm onFinish={onSubmit}>
         <div>
           <label htmlFor="email">이메일</label>
           <br />
@@ -86,7 +168,6 @@ const Signup = () => {
             className={EmailInput}
             value={email}
             onChange={onChangeEmail}
-            required
             style={{ marginRight: 8 }}
           />
           {emailRequiredError && <InputError>이메일을 입력해야 합니다.</InputError>}
@@ -107,23 +188,27 @@ const Signup = () => {
         <div>
           <label htmlFor="email">인증번호 입력</label>
           <br />
-          <InputField name="email-authentication" required />
+          <InputField name="email-authentication" className={UserEmailAuthCodeInput} value={userEmailAuthCode} onChange={onChangeUserEmailAuthCode} />
+          {userEmailAuthCodeRequiredError && <InputError>인증번호를 입력해야 합니다.</InputError>}
+          {userEmailAuthCodeValidationError && <InputError>인증번호가 틀렸습니다.</InputError>}
         </div>
         <div>
           <label htmlFor="password">비밀번호</label>
           <br />
           <InputField
             name="password"
+            className={PasswordInput}
             value={password}
             onChange={onChangePassword}
-            required
           />
+          {passwordRequiredError && <InputError>비밀번호를 입력해야 합니다.</InputError>}
         </div>
         <div>
           <label htmlFor="password-check">비밀번호 재확인</label>
           <br />
-          <InputField name="password-check" className={PasswordInput} value={passwordCheck} onChange={onChangePasswordCheck} required />
-          {passwordError && <InputError>비밀번호가 일치하지 않습니다.</InputError>}
+          <InputField name="password-check" className={PasswordCheckInput} value={passwordCheck} onChange={onChangePasswordCheck} />
+          {passwordCheckRequiredError && <InputError>비밀번호를 재확인해야 합니다.</InputError>}
+          {passwordCheckError && <InputError>비밀번호가 일치하지 않습니다.</InputError>}
         </div>
         <div>
           <Button
@@ -139,7 +224,7 @@ const Signup = () => {
             가입하기
           </Button>
         </div>
-      </LoginForm>
+      </SignUpForm>
     </Background>
   );
 };
