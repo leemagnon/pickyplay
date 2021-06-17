@@ -45,9 +45,6 @@ const Signup = () => {
   );
 
   const onChangeEmail = useCallback((e) => {
-    console.log('e.target.value : ', e.target.value);
-    console.log('email : ', email);
-
     setEmail(e.target.value);
 
     if (e.target.value !== '') {
@@ -57,73 +54,49 @@ const Signup = () => {
       setEmailRequiredError(true);
       setEmailValidationError(false);
     }
-  }, []);
+  }, [email]);
 
   const onChangeUserEmailAuthCode = useCallback((e) => {
-    console.log('e.target.value : ', e.target.value);
-    console.log('userEmailAuthCode : ', userEmailAuthCode);
     setUserEmailAuthCode(e.target.value);
 
     if (e.target.value !== '') {
       setUserEmailAuthCodeRequiredError(false);
     }
-  }, []);
+  }, [userEmailAuthCode]);
 
   const onChangePassword = useCallback((e) => {
-    console.log('e.target.value : ', e.target.value);
-    console.log('password : ', password);
-
     setPassword(e.target.value);
 
     if (e.target.value !== '') {
       setPasswordRequiredError(false);
     }
-  }, []);
+  }, [password]);
 
   const onChangePasswordCheck = useCallback((e) => {
-    console.log('e.target.value : ', e.target.value);
-    console.log('passwordCheck : ', passwordCheck);
-
     setPasswordCheck(e.target.value);
     setPasswordCheckError(e.target.value !== password);
 
     if (e.target.value !== '') {
       setPasswordCheckRequiredError(false);
     }
-  }, [password]);
+  }, [password, passwordCheck]);
 
   const onSubmit = useCallback(() => {
     if (email === '') {
-      console.log('email : ', email);
-      console.log('userEmailAuthCode : ', userEmailAuthCode);
-      console.log('password : ', password);
-      console.log('passwordCheck : ', passwordCheck);
       setEmailValidationError(false);
       return setEmailRequiredError(true);
     }
 
     if (userEmailAuthCode === '') {
-      console.log('email : ', email);
-      console.log('userEmailAuthCode : ', userEmailAuthCode);
-      console.log('password : ', password);
-      console.log('passwordCheck : ', passwordCheck);
       setUserEmailAuthCodeValidationError(false);
       return setUserEmailAuthCodeRequiredError(true);
     }
 
     if (password === '') {
-      console.log('email : ', email);
-      console.log('userEmailAuthCode : ', userEmailAuthCode);
-      console.log('password : ', password);
-      console.log('passwordCheck : ', passwordCheck);
       return setPasswordRequiredError(true);
     }
 
     if (password !== '' && passwordCheck === '') {
-      console.log('passwordCheck : ', passwordCheck); console.log('email : ', email);
-      console.log('userEmailAuthCode : ', userEmailAuthCode);
-      console.log('password : ', password);
-      console.log('passwordCheck : ', passwordCheck);
       setPasswordCheckError(false);
       return setPasswordCheckRequiredError(true);
     }
@@ -143,13 +116,13 @@ const Signup = () => {
       return setPasswordCheckError(true);
     }
 
-    console.log(email, password, userEmailAuthCode, passwordCheck);
+    console.log(email, userEmailAuthCode, password, passwordCheck);
 
     dispatch({
       type: SIGN_UP_REQUEST,
       data: { email, password },
     });
-  }, [email, password, passwordCheck]);
+  }, [email, userEmailAuthCode, password, passwordCheck]);
 
   return (
     <Background>
