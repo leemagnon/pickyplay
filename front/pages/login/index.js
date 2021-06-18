@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
-import useInput from '../../hooks/useInput';
 import { LOAD_QR_CODE_REQUEST } from '../../reducers/user';
 import {
   Background,
@@ -20,20 +19,50 @@ import {
 /* 로그인 컴포넌트 */
 const LogIn = () => {
   const dispatch = useDispatch();
-  const { loadQRCodeError } = useSelector((state) => state.user);
-  const [email, onChangeEmail] = useInput('');
-  const [password, onChangePassword] = useInput('');
-  const IsEmailError = true;
-  const IsPasswordError = false;
+  const { loadQRCodeError, loadQRCodeDone, QRCode } = useSelector((state) => state.user);
+  const [email, setEmail] = useState('');
+  const [emailRequiredError, setEmailRequiredError] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordRequiredError, setPasswordRequiredError] = useState(false);
+
+  const EmailInput = emailRequiredError ? 'error' : null;
+  const PasswordInput = passwordRequiredError ? 'error' : null;
 
   useEffect(() => {
-    if (loadQRCodeError) {
-      alert(loadQRCodeError);
+    if (loadQRCodeDone) {
+      alert(QRCode);
     }
-  }, [loadQRCodeError]);
+  }, [loadQRCodeDone]);
 
-  const onSubmit = useCallback(() => {
+  const onChangeEmail = useCallback((e) => {
+    setEmail(e.target.value);
+
+    if (e.target.value !== '') {
+      setEmailRequiredError(false);
+    }
+  }, [email]);
+
+  const onChangePassword = useCallback((e) => {
+    setPassword(e.target.value);
+
+    if (e.target.value !== '') {
+      setPasswordRequiredError(false);
+    }
+  }, [password]);
+
+  const onSubmit = useCallback((e) => {
+    e.preventDefault();
+
+    if (email === '') {
+      return setEmailRequiredError(true);
+    }
+
+    if (password === '') {
+      return setPasswordRequiredError(true);
+    }
+
     console.log(email, password);
+
     dispatch({
       type: LOAD_QR_CODE_REQUEST,
       data: { email, password },
@@ -56,32 +85,30 @@ const LogIn = () => {
 
           <Input
             type="email"
-            className={IsEmailError ? 'error' : ''}
+            className={EmailInput}
             id="email"
             name="email"
             value={email}
             onChange={onChangeEmail}
             placeholder="이메일 주소"
-            required
           />
-          {IsEmailError && (
+          {emailRequiredError && (
             <InputError className="font-nanum-gothic">
-              정확한 이메일 주소를 입력하세요.
+              이메일을 입력하세요.
             </InputError>
           )}
           <Input
             type="password"
-            className={IsPasswordError ? 'error' : ''}
+            className={PasswordInput}
             id="password"
             name="password"
             value={password}
             onChange={onChangePassword}
             placeholder="비밀번호"
-            required
           />
-          {IsPasswordError && (
+          {passwordRequiredError && (
             <InputError className="font-nanum-gothic">
-              비밀번호는 8 - 20자 사이여야 합니다.
+              비밀번호를 입력하세요.
             </InputError>
           )}
           <Button type="submit">로그인</Button>

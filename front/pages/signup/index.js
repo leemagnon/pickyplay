@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'antd';
+import Router from 'next/router';
 import { Background, Logo, SignUpForm, InputField, InputError } from './styles';
 import { GET_EMAIL_AUTH_CODE_REQUEST, SIGN_UP_REQUEST } from '../../reducers/user';
 
@@ -9,7 +10,10 @@ const Signup = () => {
   const {
     getEmailAuthCodeLoading,
     signUpLoading,
+    signUpDone,
+    signUpError,
     emailAuthCode,
+    me,
   } = useSelector((state) => state.user);
   const [email, setEmail] = useState('');
   const [emailRequiredError, setEmailRequiredError] = useState(false);
@@ -19,16 +23,37 @@ const Signup = () => {
   const [userEmailAuthCodeValidationError, setUserEmailAuthCodeValidationError] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordRequiredError, setPasswordRequiredError] = useState(false);
+  const [passwordLengthError, setPasswordLengthError] = useState(false);
   const [passwordCheck, setPasswordCheck] = useState('');
   const [passwordCheckRequiredError, setPasswordCheckRequiredError] = useState(false);
   const [passwordCheckError, setPasswordCheckError] = useState(false);
-  const reg = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+  const emailRule = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+  const passwordRule = /^.*(?=^.{8,20}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
 
   // 클래스 명
   const EmailInput = emailRequiredError || emailValidationError ? 'error' : null;
   const UserEmailAuthCodeInput = userEmailAuthCodeRequiredError || userEmailAuthCodeValidationError ? 'error' : null;
   const PasswordCheckInput = passwordCheckRequiredError || passwordCheckError ? 'error' : null;
-  const PasswordInput = passwordRequiredError ? 'error' : null;
+  const PasswordInput = passwordRequiredError || passwordLengthError ? 'error' : null;
+
+  useEffect(() => { // 로그인한 상태
+    if (me) {
+      Router.replace('/');
+    }
+  }, [me]);
+
+  useEffect(() => {
+    if (signUpDone) {
+      Router.replace('/login');
+    }
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) { // 이메일 중복 등의 에러 발생 시 alert 띄우기
+      alert(signUpError.message);
+    }
+  }, [signUpError]);
 
   const getEmailAuthCode = useCallback(
     () => {
@@ -49,7 +74,7 @@ const Signup = () => {
 
     if (e.target.value !== '') {
       setEmailRequiredError(false);
-      setEmailValidationError(!reg.test(e.target.value));
+      setEmailValidationError(!emailRule.test(e.target.value));
     } else {
       setEmailRequiredError(true);
       setEmailValidationError(false);
@@ -69,6 +94,12 @@ const Signup = () => {
 
     if (e.target.value !== '') {
       setPasswordRequiredError(false);
+
+      if (!passwordRule.test(e.target.value)) {
+        setPasswordLengthError(true);
+      } else {
+        setPasswordLengthError(false);
+      }
     }
   }, [password]);
 
@@ -101,7 +132,7 @@ const Signup = () => {
       return setPasswordCheckRequiredError(true);
     }
 
-    if (email !== '' && !reg.test(email)) {
+    if (email !== '' && !emailRule.test(email)) {
       setEmailRequiredError(false);
       return setEmailValidationError(true);
     }
@@ -175,6 +206,7 @@ const Signup = () => {
             onChange={onChangePassword}
           />
           {passwordRequiredError && <InputError>비밀번호를 입력해야 합니다.</InputError>}
+          {passwordLengthError && <InputError>영문/숫자/특수문자 포함, 8자~20자</InputError>}
         </div>
         <div>
           <label htmlFor="password-check">비밀번호 재확인</label>

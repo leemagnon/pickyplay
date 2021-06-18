@@ -2,6 +2,7 @@ import produce from 'immer';
 
 export const initialState = {
   emailAuthCode: '',
+  QRCode: '',
   getEmailAuthCodeLoading: false, // 이메일 인증 번호 받아오기 시도중
   getEmailAuthCodeDone: false,
   getEmailAuthCodeError: null,
@@ -65,6 +66,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_QR_CODE_SUCCESS:
       draft.loadQRCodeLoading = false;
       draft.loadQRCodeDone = true;
+      draft.QRCode = action.data;
       break;
     case LOAD_QR_CODE_FAILURE:
       draft.loadQRCodeLoading = false;

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import {
+  Table,
   Model,
   DataType,
   Unique,
@@ -11,6 +12,7 @@ import {
   AllowNull,
 } from 'sequelize-typescript';
 
+@Table
 export default class User extends Model {
   @IsEmail
   @Unique

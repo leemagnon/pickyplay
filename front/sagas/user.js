@@ -5,7 +5,7 @@ import {
   GET_EMAIL_AUTH_CODE_SUCCESS,
   GET_EMAIL_AUTH_CODE_FAILURE,
   LOAD_QR_CODE_REQUEST,
-  // LOAD_QR_CODE_SUCCESS,
+  LOAD_QR_CODE_SUCCESS,
   LOAD_QR_CODE_FAILURE,
   LOG_IN_REQUEST,
   LOG_IN_SUCCESS,
@@ -83,11 +83,10 @@ function loadQRCodeAPI(data) {
 function* loadQRCode(action) {
   try {
     const result = yield call(loadQRCodeAPI, action.data);
-    console.log(result);
-    // yield put({
-    //   type: LOAD_QR_CODE_SUCCESS,
-    //   data: result.data,
-    // });
+    yield put({
+      type: LOAD_QR_CODE_SUCCESS,
+      data: result.data,
+    });
   } catch (err) {
     yield put({
       type: LOAD_QR_CODE_FAILURE,

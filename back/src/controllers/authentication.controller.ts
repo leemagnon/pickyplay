@@ -28,11 +28,10 @@ class AuthenticationController implements Controller {
   }
 
   private registration = async (req: Request, res: Response, next: NextFunction) => {
-    console.log('req.body : ', req.body);
     const userData: CreateUserDto = req.body;
     try {
       const user = await this.authenticationService.register(userData);
-      res.send(user);
+      res.status(201).send(user);
     } catch (error) {
       console.error(error);
       next(error);

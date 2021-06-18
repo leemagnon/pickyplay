@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import * as config from '../config/config';
+import User from './user.model';
 
 export default class DB {
   public sequelize: Sequelize;
@@ -8,5 +9,6 @@ export default class DB {
   constructor() {
     this.env = process.env.NODE_ENV || 'development';
     this.sequelize = new Sequelize(config[this.env]);
+    this.sequelize.addModels([User]);
   }
 }
