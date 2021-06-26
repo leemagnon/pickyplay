@@ -4,8 +4,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import Slider from 'react-slick';
 import styled, { createGlobalStyle } from 'styled-components';
+import Menu from './Menu';
 import { LOAD_RANDOM_MOVIE_REQUEST, SEARCH_MOVIE_REQUEST } from '../reducers/movie';
 import SearchedMovieList from './SearchedMovieList';
+import gravatar from 'gravatar';
 
 const Wrapper1 = styled.div`
   display: flex;
@@ -79,6 +81,49 @@ const Global = createGlobalStyle`
   }
 `;
 
+const ProfileImg = styled.img`
+  width: 38px;
+  height: 38px;
+  border-radius: 5px;
+`;
+
+const ProfileModal = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  & img {
+    display: flex;
+  }
+  & > div {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+  }
+  & #profile-name {
+    display: inline-flex;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  & #profile-menu {
+    font-size: 15px;
+  }
+  & #home-img {
+    margin-left: 10px;
+  }
+`;
+
+const LogOutButton = styled.button`
+  border: none;
+  width: 100%;
+  border-top: 1px solid rgb(29, 28, 29);
+  background: transparent;
+  display: block;
+  height: 33px;
+  padding: 5px 20px 5px;
+  outline: none;
+  cursor: pointer;
+`;
+
 const AppLayout = ({ children }) => {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
@@ -86,6 +131,7 @@ const AppLayout = ({ children }) => {
   const [isHome, setIsHome] = useState(true);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const settings = { // slider 세팅
     dots: false,
     arrows: false,
@@ -98,7 +144,6 @@ const AppLayout = ({ children }) => {
   };
 
   const onChangeText = useCallback((e) => {
-    console.log('onChangeText : ', e.target.value);
     if (e.target.value !== '') {
       setIsHome(false);
     } else {
@@ -127,6 +172,10 @@ const AppLayout = ({ children }) => {
     dispatch({
       type: LOAD_RANDOM_MOVIE_REQUEST,
     });
+  }, []);
+
+  const toggleUserProfile = useCallback(() => {
+    setShowUserMenu(prev => !prev);
   }, []);
 
   return (
@@ -163,9 +212,22 @@ const AppLayout = ({ children }) => {
           </div>
 
           {me ? (
-            <Link href="/profile" className="font-nanum-gothic">
-              <a style={{ fontSize: '18px', fontWeight: 'bold' }}>프로필</a>
-            </Link>
+            <>
+              <div onMouseEnter={toggleUserProfile}>
+                <ProfileImg src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} />
+              </div>
+              {showUserMenu && (
+                <Menu style={{ right: 0, top: 38 }} setShowUserMenu={setShowUserMenu}>
+                  <ProfileModal>
+                    <img src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} style={{borderRadius: '5px'}} />
+                    <div id="profile-name">쥐돌이이이이이이이이</div> 
+                    <div id="profile-menu">마이페이지로 이동 👉 </div>
+                    <img id="home-img" src='/home.png' alt={me.nickname} />
+                  </ProfileModal>
+                  <LogOutButton>로그아웃</LogOutButton>
+                </Menu>
+              )}
+            </>
           ) : (
             <Link href="/login" className="font-nanum-gothic">
               <a style={{ fontSize: '18px', fontWeight: 'bold' }}>로그인</a>

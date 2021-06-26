@@ -22,6 +22,7 @@ class AuthenticationController implements Controller {
   private initializeRoutes() {
     this.router.post(`${this.path}/register`, this.registration);
     this.router.post(`${this.path}/emailAuthCode`, this.getEmailAuthCode);
+    this.router.post(`${this.path}/nickname`, this.checkDuplicatedNickname);
     this.router.post(`${this.path}/login`, this.loggingIn);
     this.router.post(`${this.path}/2fa/authenticate`, this.secondFactorAuthentication);
     this.router.post(`${this.path}/logout`, authMiddleware, this.loggingOut);
@@ -55,11 +56,23 @@ class AuthenticationController implements Controller {
     }
   };
 
+  private checkDuplicatedNickname = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log(req.body);
+      const msg = await this.authenticationService.checkDuplicatedNickname(req.body.nickname);
+      res.status(200).send(msg);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
   private loggingIn = async (req: Request, res: Response, next: NextFunction) => {
     const logInData: LogInDto = req.body;
     try {
       const otpauthUrl = await this.authenticationService.loggingIn(logInData, res);
-      this.authenticationService.respondWithQRCode(res, otpauthUrl);
+      const url = await this.authenticationService.generateQRCodeURL(otpauthUrl);
+      res.status(200).send(url);
     } catch (error) {
       console.error(error);
       next(error);
@@ -74,9 +87,7 @@ class AuthenticationController implements Controller {
       user.password = undefined;
       user.twoFactorAuthenticationCode = undefined;
       res.setHeader('Set-Cookie', [this.authenticationService.createCookie(tokenData)]);
-      res.send({
-        user,
-      });
+      res.send(user);
     } else {
       next(new WrongAuthenticationTokenException());
     }

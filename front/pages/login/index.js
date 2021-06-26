@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
+import Router from 'next/router';
 import { LOAD_QR_CODE_REQUEST } from '../../reducers/user';
+import Modal from '../../components/Modal';
 import {
   Background,
   Header,
@@ -19,18 +21,25 @@ import {
 /* 로그인 컴포넌트 */
 const LogIn = () => {
   const dispatch = useDispatch();
-  const { loadQRCodeError, loadQRCodeDone, QRCode } = useSelector((state) => state.user);
+  const { loadQRCodeDone, QRCode, secondAuthDone, me } = useSelector((state) => state.user);
   const [email, setEmail] = useState('');
   const [emailRequiredError, setEmailRequiredError] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordRequiredError, setPasswordRequiredError] = useState(false);
+  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
 
   const EmailInput = emailRequiredError ? 'error' : null;
   const PasswordInput = passwordRequiredError ? 'error' : null;
 
   useEffect(() => {
+    if (secondAuthDone && me) {
+      Router.replace('/');
+    }
+  }, [secondAuthDone]);
+
+  useEffect(() => {
     if (loadQRCodeDone) {
-      alert(QRCode);
+      setShowQRCodeModal(true);
     }
   }, [loadQRCodeDone]);
 
@@ -121,6 +130,9 @@ const LogIn = () => {
           </Link>
         </SignUp>
       </LogInBody>
+      {showQRCodeModal && (
+      <Modal setShowQRCodeModal={setShowQRCodeModal} QRCode={QRCode} email={email} />
+      )}
       <Footer className="font-nanum-gothic">
         <div style={{ minWidth: '929px' }}>
           <div style={{ display: 'inline-block', verticalAlign: 'middle' }}>

@@ -3,9 +3,16 @@ import produce from 'immer';
 export const initialState = {
   emailAuthCode: '',
   QRCode: '',
+  msg: '', // 닉네임 중복 검사 메시지
   getEmailAuthCodeLoading: false, // 이메일 인증 번호 받아오기 시도중
   getEmailAuthCodeDone: false,
   getEmailAuthCodeError: null,
+  checkDuplicatedNicknameLoading: false, // 닉네임 중복 검사중
+  checkDuplicatedNicknameDone: false,
+  checkDuplicatedNicknameError: null,
+  secondAuthLoading: false, // 2FA 시도중
+  secondAuthDone: false,
+  secondAuthError: null,
   logInLoading: false, // 로그인 시도중
   logInDone: false,
   logInError: null,
@@ -24,6 +31,14 @@ export const initialState = {
 export const GET_EMAIL_AUTH_CODE_REQUEST = 'GET_EMAIL_AUTH_CODE_REQUEST';
 export const GET_EMAIL_AUTH_CODE_SUCCESS = 'GET_EMAIL_AUTH_CODE_SUCCESS';
 export const GET_EMAIL_AUTH_CODE_FAILURE = 'GET_EMAIL_AUTH_CODE_FAILURE';
+
+export const CHECK_DUPLICATED_NICKNAME_REQUEST = 'CHECK_DUPLICATED_NICKNAME_REQUEST';
+export const CHECK_DUPLICATED_NICKNAME_SUCCESS = 'CHECK_DUPLICATED_NICKNAME_SUCCESS';
+export const CHECK_DUPLICATED_NICKNAME_FAILURE = 'CHECK_DUPLICATED_NICKNAME_FAILURE';
+
+export const SECOND_AUTH_REQUEST = 'SECOND_AUTH_REQUEST';
+export const SECOND_AUTH_SUCCESS = 'SECOND_AUTH_SUCCESS';
+export const SECOND_AUTH_FAILURE = 'SECOND_AUTH_FAILURE';
 
 export const LOAD_QR_CODE_REQUEST = 'LOAD_QR_CODE_REQUEST';
 export const LOAD_QR_CODE_SUCCESS = 'LOAD_QR_CODE_SUCCESS';
@@ -57,6 +72,37 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.getEmailAuthCodeLoading = false;
       draft.getEmailAuthCodeDone = false;
       draft.getEmailAuthCodeError = action.error;
+      break;
+    case CHECK_DUPLICATED_NICKNAME_REQUEST:
+      draft.checkDuplicatedNicknameLoading = true;
+      draft.checkDuplicatedNicknameDone = false;
+      draft.checkDuplicatedNicknameError = null;
+      draft.msg = null;
+      break;
+    case CHECK_DUPLICATED_NICKNAME_SUCCESS:
+      draft.checkDuplicatedNicknameLoading = false;
+      draft.checkDuplicatedNicknameDone = true;
+      draft.msg = action.data;
+      break;
+    case CHECK_DUPLICATED_NICKNAME_FAILURE:
+      draft.checkDuplicatedNicknameLoading = false;
+      draft.checkDuplicatedNicknameDone = false;
+      draft.checkDuplicatedNicknameError = action.error;
+      break;
+    case SECOND_AUTH_REQUEST:
+      draft.secondAuthLoading = true;
+      draft.secondAuthDone = false;
+      draft.secondAuthError = null;
+      break;
+    case SECOND_AUTH_SUCCESS:
+      draft.secondAuthLoading = false;
+      draft.secondAuthDone = true;
+      draft.me = action.data;
+      break;
+    case SECOND_AUTH_FAILURE:
+      draft.secondAuthLoading = false;
+      draft.secondAuthDone = false;
+      draft.secondAuthError = action.error;
       break;
     case LOAD_QR_CODE_REQUEST:
       draft.loadQRCodeLoading = true;

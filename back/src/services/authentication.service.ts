@@ -12,6 +12,7 @@ import TokenData from '@interfaces/tokenData.interface';
 import DataStoredInToken from '@interfaces/dataStoredInToken.interface';
 import UserWithThatEmailAlreadyExistsException from '@exceptions/UserWithThatEmailAlreadyExistsException';
 import WrongCredentialException from '@exceptions/WrongCredentialException';
+import DuplicatedNicknameException from '@exceptions/DuplicatedNicknameException';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import { Response } from 'express';
@@ -62,6 +63,15 @@ class AuthenticationService {
     transporter.close();
   }
 
+  public async checkDuplicatedNickname(nickname: string) {
+    if (await this.user.findOne({ where: { nickname } })) {
+      // 동일한 email을 가진 사용자가 존재하면
+      throw new DuplicatedNicknameException(nickname);
+    } else {
+      return '사용 가능한 닉네임입니다.';
+    }
+  }
+
   public async loggingIn(logInData: LogInDto, res: Response) {
     const user = await this.user.findOne({ where: { email: logInData.email } });
     if (user) {
@@ -94,8 +104,8 @@ class AuthenticationService {
     };
   }
 
-  public respondWithQRCode(res: Response, data: string) {
-    QRCode.toFileStream(res, data);
+  public generateQRCodeURL(data: string) {
+    return QRCode.toDataURL(data);
   }
 
   // 사용자가 Google OTP에서 얻은 1회용 패스워드가 DB에 저장된 secret code와 일치하는지 검증한다.

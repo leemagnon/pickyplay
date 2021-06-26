@@ -5,7 +5,7 @@ export const Background = styled.div`
   position: relative;
   background-color: #1d2327;
   width: 100%;
-  height: 100%;
+  height: 200%;
 `;
 
 export const Logo = styled.h1`
@@ -47,10 +47,17 @@ export const InputField = styled(Input)`
   background: #1d2428;
   border-radius: 4px;
   color: #fff;
+
   &.error {
     margin-bottom: 5px;
     border-bottom-style: solid;
     border-bottom-color: #ffff00;
+    border-bottom-width: 5px;
+  }
+  &.pass {
+    margin-bottom: 5px;
+    border-bottom-style: solid;
+    border-bottom-color: #52c41a;
     border-bottom-width: 5px;
   }
 `;

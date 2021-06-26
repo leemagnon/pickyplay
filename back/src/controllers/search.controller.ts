@@ -142,6 +142,14 @@ class SearchController implements Controller {
     try {
       let result = await this.client.search(params);
       result = result.hits.hits;
+      result = result.reduce((arr = [], doc) => {
+        // 중복된 도큐먼트 제거
+        if (arr.findIndex((v) => v._source.DOCID._cdata === doc._source.DOCID._cdata) === -1) {
+          arr.push(doc);
+        }
+        return arr;
+      }, []);
+
       for (const doc of result) {
         doc._source.posters._cdata = doc._source.posters._cdata.trim().split('|')[0];
       }
