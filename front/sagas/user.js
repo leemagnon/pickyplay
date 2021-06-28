@@ -13,38 +13,19 @@ import {
   SECOND_AUTH_REQUEST,
   SECOND_AUTH_SUCCESS,
   SECOND_AUTH_FAILURE,
-  LOG_IN_REQUEST,
-  LOG_IN_SUCCESS,
-  LOG_IN_FAILURE,
   LOG_OUT_REQUEST,
   LOG_OUT_SUCCESS,
   LOG_OUT_FAILURE,
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
   SIGN_UP_FAILURE,
+  UPDATE_USER_INFO_REQUEST,
+  UPDATE_USER_INFO_SUCCESS,
+  UPDATE_USER_INFO_FAILURE,
 } from '../reducers/user';
 
-function logInAPI(data) {
-  return axios.post('/auth/2fa/authenticate', data); // 서버로 요청을 보내는 코드
-}
-
-function* logIn(action) {
-  try {
-    const result = yield call(logInAPI, action.data);
-    yield put({
-      type: LOG_IN_SUCCESS,
-      data: result.data,
-    });
-  } catch (err) {
-    yield put({
-      type: LOG_IN_FAILURE,
-      error: err.response.data,
-    });
-  }
-}
-
 function logOutAPI() {
-  return axios.post('/api/logout');
+  return axios.post('/auth/logout');
 }
 
 function* logOut() {
@@ -129,6 +110,7 @@ function secondAuthAPI(data) {
 function* secondAuth(action) {
   try {
     const result = yield call(secondAuthAPI, action.data);
+    console.log('logIn result : ', result);
     yield put({
       type: SECOND_AUTH_SUCCESS,
       data: result.data,
@@ -160,10 +142,26 @@ function* signUp(action) {
   }
 }
 
-// 이벤트 리스너 역할
-function* watchLogIn() {
-  yield takeLatest(LOG_IN_REQUEST, logIn); // 'LOG_IN'이라는 액션이 실행되면 logIn 함수를 실행한다.
+function updateUserInfoAPI(data) {
+  return axios.patch('/auth/user', data);
 }
+
+function* updateUserInfo(action) {
+  try {
+    const result = yield call(updateUserInfoAPI, action.data);
+    yield put({
+      type: UPDATE_USER_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: UPDATE_USER_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+// 이벤트 리스너 역할
 function* watchLogOut() {
   yield takeLatest(LOG_OUT_REQUEST, logOut);
 }
@@ -182,15 +180,18 @@ function* watchSecondAuth() {
 function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
+function* watchUpdateUserInfo() {
+  yield takeLatest(UPDATE_USER_INFO_REQUEST, updateUserInfo);
+}
 
 export default function* userSaga() {
   yield all([
-    fork(watchLogIn),
     fork(watchLogOut),
     fork(watchGetEmailAuthCode),
     fork(watchCheckDuplicatedNickname),
-    fork(watchLoadQRCode),
+    fork(watchLoadQRCode), // 로그인
     fork(watchSecondAuth),
     fork(watchSignUp),
+    fork(watchUpdateUserInfo),
   ]);
 }

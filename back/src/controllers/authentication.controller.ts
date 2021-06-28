@@ -9,6 +9,7 @@ import RequestWithUser from '@interfaces/requestWithUser.interface';
 import authMiddleware from '@middleware/auth.middleware';
 import WrongAuthenticationTokenException from '@exceptions/WrongAuthenticationTokenException';
 import randomBytes from 'randombytes';
+import multer from 'multer';
 
 class AuthenticationController implements Controller {
   public path = '/auth';
@@ -26,6 +27,7 @@ class AuthenticationController implements Controller {
     this.router.post(`${this.path}/login`, this.loggingIn);
     this.router.post(`${this.path}/2fa/authenticate`, this.secondFactorAuthentication);
     this.router.post(`${this.path}/logout`, authMiddleware, this.loggingOut);
+    this.router.patch(`${this.path}/user`, this.updateUserInfo);
   }
 
   private registration = async (req: Request, res: Response, next: NextFunction) => {
@@ -93,9 +95,22 @@ class AuthenticationController implements Controller {
     }
   };
 
-  private loggingOut = (req: Request, res: Response) => {
-    res.setHeader('Set-Cookie', ['Authorization=;Max-Age=0']);
-    res.send(200);
+  private loggingOut = (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.setHeader('Set-Cookie', ['Authorization=;Max-Age=0']);
+      res.send(200);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private updateUserInfo = (req: Request, res: Response, next: NextFunction) => {
+    try {
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
   };
 }
 

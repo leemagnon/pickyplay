@@ -24,7 +24,7 @@ const Menu = ({ children, setShowUserMenu }) => {
   }, []);
 
   return (
-    <CreateMenu onMouseLeave={onCloseModal}>
+    <CreateMenu onClick={onCloseModal}>
       {children}
     </CreateMenu>
   );

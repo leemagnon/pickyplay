@@ -2,10 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
+import Router from 'next/router';
 import Slider from 'react-slick';
 import styled, { createGlobalStyle } from 'styled-components';
 import Menu from './Menu';
 import { LOAD_RANDOM_MOVIE_REQUEST, SEARCH_MOVIE_REQUEST } from '../reducers/movie';
+import { LOG_OUT_REQUEST } from '../reducers/user';
 import SearchedMovieList from './SearchedMovieList';
 import gravatar from 'gravatar';
 
@@ -95,8 +97,6 @@ const ProfileModal = styled.div`
     display: flex;
   }
   & > div {
-    display: flex;
-    flex-direction: column;
     margin-left: 10px;
   }
   & #profile-name {
@@ -112,7 +112,7 @@ const ProfileModal = styled.div`
   }
 `;
 
-const LogOutButton = styled.button`
+const MenuButton = styled.button`
   border: none;
   width: 100%;
   border-top: 1px solid rgb(29, 28, 29);
@@ -213,7 +213,7 @@ const AppLayout = ({ children }) => {
 
           {me ? (
             <>
-              <div onMouseEnter={toggleUserProfile}>
+              <div onClick={toggleUserProfile}>
                 <ProfileImg src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} />
               </div>
               {showUserMenu && (
@@ -221,10 +221,10 @@ const AppLayout = ({ children }) => {
                   <ProfileModal>
                     <img src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} style={{borderRadius: '5px'}} />
                     <div id="profile-name">쥐돌이이이이이이이이</div> 
-                    <div id="profile-menu">마이페이지로 이동 👉 </div>
-                    <img id="home-img" src='/home.png' alt={me.nickname} />
                   </ProfileModal>
-                  <LogOutButton>로그아웃</LogOutButton>
+                  <MenuButton onClick={() => Router.replace('/MyMovies')}>무비컬렉션</MenuButton>
+                  <MenuButton onClick={() => Router.replace('/UpdateUserInfo')}>회원정보수정</MenuButton>
+                  <MenuButton onClick={() => dispatch({ type: LOG_OUT_REQUEST })}>로그아웃</MenuButton>
                 </Menu>
               )}
             </>
