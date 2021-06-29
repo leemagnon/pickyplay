@@ -10,11 +10,28 @@ import authMiddleware from '@middleware/auth.middleware';
 import WrongAuthenticationTokenException from '@exceptions/WrongAuthenticationTokenException';
 import randomBytes from 'randombytes';
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 class AuthenticationController implements Controller {
   public path = '/auth';
   public router = express.Router();
   private authenticationService = new AuthenticationService();
+
+  private upload = multer({
+    storage: multer.diskStorage({
+      destination(req, file, done) {
+        done(null, 'uploads');
+      },
+      filename(req, file, done) {
+        // 쥐돌이.png
+        const ext = path.extname(file.originalname); // 확장자 추출(.png)
+        const basename = path.basename(file.originalname, ext); // 쥐돌이
+        done(null, basename + '_' + new Date().getTime() + ext);
+      },
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  });
 
   constructor() {
     this.initializeRoutes();
@@ -27,7 +44,10 @@ class AuthenticationController implements Controller {
     this.router.post(`${this.path}/login`, this.loggingIn);
     this.router.post(`${this.path}/2fa/authenticate`, this.secondFactorAuthentication);
     this.router.post(`${this.path}/logout`, authMiddleware, this.loggingOut);
-    this.router.patch(`${this.path}/user`, this.updateUserInfo);
+    // 회원 정보 수정
+    this.router.post(`${this.path}/newEmail`, this.updateEmail);
+    this.router.post(`${this.path}/newPassword`, this.updatePassword);
+    this.router.post(`${this.path}/newProfile`, this.upload.single('profileImg'), this.updateProfile);
   }
 
   private registration = async (req: Request, res: Response, next: NextFunction) => {
@@ -105,9 +125,30 @@ class AuthenticationController implements Controller {
     }
   };
 
-  private updateUserInfo = (req: Request, res: Response, next: NextFunction) => {
+  private updateEmail = (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(req.body);
     } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private updatePassword = (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log(req.body);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private updateProfile = (req: Request, res: Response, next: NextFunction) => {
+    try {
+      fs.accessSync('uploads');
+      console.log(req.files);
+    } catch (error) {
+      fs.mkdirSync('uploads'); // 업로드 폴더가 없으므로 생성
       console.error(error);
       next(error);
     }

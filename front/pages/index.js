@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import AppLayout from '../components/AppLayout';
+import wrapper from '../store/configureStore';
+import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 
 const Contents = styled.div`
   width: 100%;
@@ -71,6 +73,13 @@ const Home = () => (
   </AppLayout>
 );
 
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  console.log('getServerSideProps start');
+  console.log('getServerSideProps | ', context.req.headers);
+  context.store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
+});
 export default Home;
 
 // 메인 화면

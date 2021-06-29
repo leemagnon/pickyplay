@@ -10,6 +10,9 @@ import {
   LOAD_QR_CODE_REQUEST,
   LOAD_QR_CODE_SUCCESS,
   LOAD_QR_CODE_FAILURE,
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_SUCCESS,
+  LOAD_MY_INFO_FAILURE,
   SECOND_AUTH_REQUEST,
   SECOND_AUTH_SUCCESS,
   SECOND_AUTH_FAILURE,
@@ -19,9 +22,9 @@ import {
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
   SIGN_UP_FAILURE,
-  UPDATE_USER_INFO_REQUEST,
-  UPDATE_USER_INFO_SUCCESS,
-  UPDATE_USER_INFO_FAILURE,
+  UPLOAD_PROFILE_IMAGE_REQUEST,
+  UPLOAD_PROFILE_IMAGE_SUCCESS,
+  UPLOAD_PROFILE_IMAGE_FAILURE,
 } from '../reducers/user';
 
 function logOutAPI() {
@@ -110,7 +113,7 @@ function secondAuthAPI(data) {
 function* secondAuth(action) {
   try {
     const result = yield call(secondAuthAPI, action.data);
-    console.log('logIn result : ', result);
+
     yield put({
       type: SECOND_AUTH_SUCCESS,
       data: result.data,
@@ -118,6 +121,26 @@ function* secondAuth(action) {
   } catch (err) {
     yield put({
       type: SECOND_AUTH_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadMyInfoAPI() {
+  return axios.get('/auth/user');
+}
+
+function* loadMyInfo() {
+  try {
+    const result = yield call(loadMyInfoAPI);
+    yield put({
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_MY_INFO_FAILURE,
       error: err.response.data,
     });
   }
@@ -142,20 +165,20 @@ function* signUp(action) {
   }
 }
 
-function updateUserInfoAPI(data) {
-  return axios.patch('/auth/user', data);
+function uploadProfileImageAPI(data) {
+  return axios.post('/auth/upload', data);
 }
 
-function* updateUserInfo(action) {
+function* uploadProfileImage(action) {
   try {
-    const result = yield call(updateUserInfoAPI, action.data);
+    const result = yield call(uploadProfileImageAPI, action.data);
     yield put({
-      type: UPDATE_USER_INFO_SUCCESS,
+      type: UPLOAD_PROFILE_IMAGE_SUCCESS,
       data: result.data,
     });
   } catch (err) {
     yield put({
-      type: UPDATE_USER_INFO_FAILURE,
+      type: UPLOAD_PROFILE_IMAGE_FAILURE,
       error: err.response.data,
     });
   }
@@ -177,11 +200,14 @@ function* watchLoadQRCode() {
 function* watchSecondAuth() {
   yield takeLatest(SECOND_AUTH_REQUEST, secondAuth);
 }
+function* watchLoadMyInfo() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
 function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
-function* watchUpdateUserInfo() {
-  yield takeLatest(UPDATE_USER_INFO_REQUEST, updateUserInfo);
+function* watchUploadProfileImage() {
+  yield takeLatest(UPLOAD_PROFILE_IMAGE_REQUEST, uploadProfileImage);
 }
 
 export default function* userSaga() {
@@ -191,7 +217,8 @@ export default function* userSaga() {
     fork(watchCheckDuplicatedNickname),
     fork(watchLoadQRCode), // 로그인
     fork(watchSecondAuth),
+    fork(watchLoadMyInfo),
     fork(watchSignUp),
-    fork(watchUpdateUserInfo),
+    fork(watchUploadProfileImage),
   ]);
 }

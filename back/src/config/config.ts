@@ -10,7 +10,7 @@ module.exports = {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD,
     storage: ':memory:',
-    models: [__dirname + '/models'],
+    models: [path.join(__dirname, 'models')],
     modelMatch: (filename, member) => {
       return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
     },

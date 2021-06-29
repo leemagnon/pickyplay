@@ -19,15 +19,19 @@ export const initialState = {
   loadQRCodeLoading: false, // QR Code 불러오기 시도중
   loadQRCodeDone: false,
   loadQRCodeError: null,
+  loadMyInfoLoading: false, // 유저 정보 가져오기 시도중
+  loadMyInfoDone: false,
+  loadMyInfoError: null,
   logOutLoading: false, // 로그아웃 시도중
   logOutDone: false,
   logOutError: null,
   signUpLoading: false, // 회원가입 시도중
   signUpDone: false,
   signUpError: null,
-  updateUserInfoLoading: false, // 회원정보 수정 시도중
-  updateUserInfoDone: false,
-  updateUserInfoError: null,
+  uploadProfileImgLoading: false, // 프로필 이미지 업로드 시도중
+  uploadProfileImgDone: false,
+  uploadProfileImgError: null,
+  profileImgPath: '',
   me: null,
 };
 
@@ -47,6 +51,10 @@ export const LOAD_QR_CODE_REQUEST = 'LOAD_QR_CODE_REQUEST';
 export const LOAD_QR_CODE_SUCCESS = 'LOAD_QR_CODE_SUCCESS';
 export const LOAD_QR_CODE_FAILURE = 'LOAD_QR_CODE_FAILURE';
 
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
+
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
@@ -59,13 +67,9 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
-export const UPDATE_USER_INFO_REQUEST = 'UPDATE_USER_INFO_REQUEST';
-export const UPDATE_USER_INFO_SUCCESS = 'UPDATE_USER_INFO_SUCCESS';
-export const UPDATE_USER_INFO_FAILURE = 'UPDATE_USER_INFO_FAILURE';
-
-export const UPLOAD_PROFILE_IMG_REQUEST = 'UPLOAD_PROFILE_IMG_REQUEST';
-export const UPLOAD_PROFILE_IMG_SUCCESS = 'UPLOAD_PROFILE_IMG_SUCCESS';
-export const UPLOAD_PROFILE_IMG_FAILURE = 'UPLOAD_PROFILE_IMG_FAILURE';
+export const UPLOAD_PROFILE_IMAGE_REQUEST = 'UPLOAD_PROFILE_IMAGE_REQUEST';
+export const UPLOAD_PROFILE_IMAGE_SUCCESS = 'UPLOAD_PROFILE_IMAGE_SUCCESS';
+export const UPLOAD_PROFILE_IMAGE_FAILURE = 'UPLOAD_PROFILE_IMAGE_FAILURE';
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
@@ -109,6 +113,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.secondAuthLoading = false;
       draft.secondAuthDone = true;
       draft.me = action.data;
+      draft.QRCode = '';
       break;
     case SECOND_AUTH_FAILURE:
       draft.secondAuthLoading = false;
@@ -129,6 +134,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.loadQRCodeLoading = false;
       draft.loadQRCodeDone = false;
       draft.loadQRCodeError = action.error;
+      break;
+    case LOAD_MY_INFO_REQUEST:
+      draft.loadMyInfoLoading = true;
+      draft.loadMyInfoError = null;
+      draft.loadMyInfoDone = false;
+      break;
+    case LOAD_MY_INFO_SUCCESS:
+      draft.loadMyInfoLoading = false;
+      draft.loadMyInfoDone = true;
+      draft.me = action.data;
+      break;
+    case LOAD_MY_INFO_FAILURE:
+      draft.loadMyInfoLoading = false;
+      draft.loadMyInfoError = action.error;
       break;
     case LOG_IN_REQUEST:
       draft.logInLoading = true;
@@ -167,38 +186,26 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case SIGN_UP_SUCCESS:
       draft.signUpLoading = false;
       draft.signUpDone = true;
+      draft.emailAuthCode = '';
+      draft.msg = '';
       break;
     case SIGN_UP_FAILURE:
       draft.signUpLoading = false;
       draft.signUpError = action.error;
       break;
-    case UPDATE_USER_INFO_REQUEST:
-      draft.updateUserInfoLoading = true;
-      draft.updateUserInfoDone = false;
-      draft.updateUserInfoError = null;
+    case UPLOAD_PROFILE_IMAGE_REQUEST:
+      draft.uploadProfileImgLoading = true;
+      draft.uploadProfileImgDone = false;
+      draft.uploadProfileImgError = null;
       break;
-    case UPDATE_USER_INFO_SUCCESS:
-      draft.updateUserInfoLoading = false;
-      draft.updateUserInfoDone = true;
-      draft.me = action.data;
+    case UPLOAD_PROFILE_IMAGE_SUCCESS:
+      draft.uploadProfileImgLoading = false;
+      draft.uploadProfileImgDone = true;
+      draft.profileImgPath = action.data;
       break;
-    case UPDATE_USER_INFO_FAILURE:
-      draft.updateProfileImgLoading = false;
-      draft.updateProfileImgError = action.error;
-      break;
-    case UPLOAD_PROFILE_IMG_REQUEST:
-      draft.updateProfileImgLoading = true;
-      draft.updateProfileImgDone = false;
-      draft.updateProfileImgError = null;
-      break;
-    case UPLOAD_PROFILE_IMG_SUCCESS:
-      draft.updateProfileImgLoading = false;
-      draft.updateProfileImgDone = true;
-      draft.me = action.data;
-      break;
-    case UPLOAD_PROFILE_IMG_FAILURE:
-      draft.updateProfileImgLoading = false;
-      draft.updateProfileImgError = action.error;
+    case UPLOAD_PROFILE_IMAGE_FAILURE:
+      draft.uploadProfileImgLoading = false;
+      draft.uploadProfileImgError = action.error;
       break;
     default:
       break;
