@@ -7,7 +7,6 @@ import Slider from 'react-slick';
 import styled, { createGlobalStyle } from 'styled-components';
 import Menu from './Menu';
 import { LOAD_RANDOM_MOVIE_REQUEST, SEARCH_MOVIE_REQUEST } from '../reducers/movie';
-import { LOG_OUT_REQUEST } from '../reducers/user';
 import SearchedMovieList from './SearchedMovieList';
 import gravatar from 'gravatar';
 
@@ -178,6 +177,10 @@ const AppLayout = ({ children }) => {
     setShowUserMenu(prev => !prev);
   }, []);
 
+  const onLogOut = useCallback(() => {
+    window.location.href = window.location.href.replace( /[\?#].*|$/, "?logout" );
+  }, []);
+
   return (
     <div style={{ backgroundColor: 'black' }}>
       <Global />
@@ -224,7 +227,7 @@ const AppLayout = ({ children }) => {
                   </ProfileModal>
                   <MenuButton onClick={() => Router.replace('/MyMovies')}>무비컬렉션</MenuButton>
                   <MenuButton onClick={() => Router.replace('/UpdateUserInfo')}>회원정보수정</MenuButton>
-                  <MenuButton onClick={() => dispatch({ type: LOG_OUT_REQUEST })}>로그아웃</MenuButton>
+                  <MenuButton onClick={onLogOut}>로그아웃</MenuButton>
                 </Menu>
               )}
             </>
