@@ -22,7 +22,6 @@ export const SEARCH_MOVIE_SUCCESS = 'SEARCH_MOVIE_SUCCESS';
 export const SEARCH_MOVIE_FAILURE = 'SEARCH_MOVIE_FAILURE';
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
-  console.log('action 데이터', action.data);
   switch (action.type) {
     case LOAD_RANDOM_MOVIE_REQUEST:
       draft.loadRandomMovieLoading = true;

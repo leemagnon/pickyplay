@@ -127,7 +127,7 @@ function* secondAuth(action) {
 }
 
 function loadMyInfoAPI() {
-  return axios.get('/auth/user');
+  return axios.get('/auth/me');
 }
 
 function* loadMyInfo() {

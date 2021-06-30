@@ -123,7 +123,7 @@ class AuthenticationService {
   }
 
   public createCookie(tokenData: TokenData) {
-    return `Authorization=${tokenData.token}; HttpOnly; SameSite=None; Path=/; Max-Age=${tokenData.expiresIn}`;
+    return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}`;
   }
 
   public createToken(user: User, isSecondFactorAuthenticated = false): TokenData {

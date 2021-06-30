@@ -38,6 +38,7 @@ class AuthenticationController implements Controller {
   }
 
   private initializeRoutes() {
+    this.router.get(`${this.path}/me`, authMiddleware, this.getMyInfo);
     this.router.post(`${this.path}/register`, this.registration);
     this.router.post(`${this.path}/emailAuthCode`, this.getEmailAuthCode);
     this.router.post(`${this.path}/nickname`, this.checkDuplicatedNickname);
@@ -49,6 +50,15 @@ class AuthenticationController implements Controller {
     this.router.post(`${this.path}/newPassword`, this.updatePassword);
     this.router.post(`${this.path}/newProfile`, this.upload.single('profileImg'), this.updateProfile);
   }
+
+  private getMyInfo = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      res.status(201).send(req.user);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
 
   private registration = async (req: Request, res: Response, next: NextFunction) => {
     const userData: CreateUserDto = req.body;
