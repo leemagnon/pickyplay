@@ -9,6 +9,7 @@ import Menu from './Menu';
 import { LOAD_RANDOM_MOVIE_REQUEST, SEARCH_MOVIE_REQUEST } from '../reducers/movie';
 import SearchedMovieList from './SearchedMovieList';
 import gravatar from 'gravatar';
+import { LOG_OUT_REQUEST } from '../reducers/user';
 
 const Wrapper1 = styled.div`
   display: flex;
@@ -178,7 +179,7 @@ const AppLayout = ({ children }) => {
   }, []);
 
   const onLogOut = useCallback(() => {
-    window.location.href = window.location.href.replace( /[\?#].*|$/, "?logout" );
+    dispatch({ type: LOG_OUT_REQUEST });
   }, []);
 
   return (
