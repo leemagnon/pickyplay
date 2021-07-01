@@ -16,6 +16,7 @@
     "@types/gravatar": "1.8.2",
     "antd": "4.10.3",
     "axios": "0.21.1",
+    "cross-env": "7.0.3",
     "faker": "5.5.3",
     "gravatar": "1.8.1",
     "immer": "9.0.2",
