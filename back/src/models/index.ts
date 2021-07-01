@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
-import * as config from '../config/config';
-import User from './user.model';
+import * as config from 'src/config/config';
+import User from 'src/models/user.model';
 
 export default class DB {
   public sequelize: Sequelize;

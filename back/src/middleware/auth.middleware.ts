@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import AuthenticationTokenMissingException from '@exceptions/AuthenticationTokenMissingException';
-import WrongAuthenticationTokenException from '@exceptions/WrongAuthenticationTokenException';
-import DataStoredInToken from '@interfaces/dataStoredInToken.interface';
-import RequestWithUser from '@interfaces/requestWithUser.interface';
-import userModel from 'models/user.model';
+import AuthenticationTokenMissingException from 'src/exceptions/AuthenticationTokenMissingException';
+import WrongAuthenticationTokenException from 'src/exceptions/WrongAuthenticationTokenException';
+import DataStoredInToken from 'src/interfaces/dataStoredInToken.interface';
+import RequestWithUser from 'src/interfaces/requestWithUser.interface';
+import userModel from 'src/models/user.model';
 
 async function authMiddleware(req: RequestWithUser, res: Response, next: NextFunction) {
   const cookies = req.cookies;

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import express from 'express';
 import 'dotenv/config';
-import errorMiddleware from '@middleware/error.middleware';
+import errorMiddleware from 'src/middleware/error.middleware';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import cors from 'cors';
-import DB from './models';
+import DB from 'src/models';
 import path from 'path';
 
 class App {

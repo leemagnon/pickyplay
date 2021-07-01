@@ -8,14 +8,10 @@
         "sourceMap": true,
         "lib": ["es2015","es2016","es2017","es2018","es2019","es2020", "DOM"],
         "target": "es6",
-        "baseUrl": "./src",
+        "baseUrl": ".",
         "outDir": "./dist",
         "paths": { // import A from @src/hello.js -> 절대 경로처럼 import할 수 있다.
-            "@interfaces/*": ["interfaces/*"],
-            "@dtos/*": ["dtos/*"],
-            "@middleware/*": ["middleware/*"],
-            "@exceptions/*": ["exceptions/*"],
-            "@utils/*": ["utils/*"],
+            "src/*": ["src/*"]
         },
     },
     "include": [

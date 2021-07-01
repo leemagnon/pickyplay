@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
-import Controller from '@interfaces/controller.interface';
-import ReviewService from 'services/review.service';
+import Controller from 'src/interfaces/controller.interface';
+import ReviewService from 'src/services/review.service';
 import multer from 'multer';
 import path from 'path';
 

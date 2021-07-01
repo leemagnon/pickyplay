@@ -1,7 +1,7 @@
-import App from './app';
-import AuthenticationController from 'controllers/authentication.controller';
-import SearchController from 'controllers/search.controller';
-import validateEnv from '@utils/validateEnv';
+import App from 'src/app';
+import AuthenticationController from 'src/controllers/authentication.controller';
+import SearchController from 'src/controllers/search.controller';
+import validateEnv from 'src/utils/validateEnv';
 
 validateEnv();
 

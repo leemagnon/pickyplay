@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import Controller from '@interfaces/controller.interface';
+import Controller from 'src/interfaces/controller.interface';
 import { Client } from 'elasticsearch';
 import axios from 'axios';
 // import CircularJSON from 'circular-json';
