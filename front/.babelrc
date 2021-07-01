@@ -1,4 +1,11 @@
 {
     "presets": ["next/babel"],
-    "plugins": [["styled-components", { "ssr": true }]]
-}
+    "plugins": [
+      ["styled-components", {
+        "ssr": true,
+        "displayName": true
+      }]
+    ]
+  }
+
+// babel-plugin-styled-components 설치 필요. css SSR을 하기 위함.

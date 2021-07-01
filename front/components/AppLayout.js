@@ -217,14 +217,14 @@ const AppLayout = ({ children }) => {
 
           {me ? (
             <>
-              <div onClick={toggleUserProfile}>
+              <div onMouseEnter={toggleUserProfile}>
                 <ProfileImg src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} />
               </div>
               {showUserMenu && (
                 <Menu style={{ right: 0, top: 38 }} setShowUserMenu={setShowUserMenu}>
                   <ProfileModal>
                     <img src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} style={{borderRadius: '5px'}} />
-                    <div id="profile-name">쥐돌이이이이이이이이</div> 
+                    <div id="profile-name">{me.nickname}</div> 
                   </ProfileModal>
                   <MenuButton onClick={() => Router.replace('/MyMovies')}>무비컬렉션</MenuButton>
                   <MenuButton onClick={() => Router.replace('/UpdateUserInfo')}>회원정보수정</MenuButton>

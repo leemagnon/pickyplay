@@ -1,9 +1,79 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'antd';
+import { Form, Input, Button } from 'antd';
 import Router from 'next/router';
-import { Background, Logo, SignUpForm, InputField, InputError } from './styles';
-import { GET_EMAIL_AUTH_CODE_REQUEST, CHECK_DUPLICATED_NICKNAME_REQUEST, SIGN_UP_REQUEST } from '../../reducers/user';
+import styled from 'styled-components';
+import { END } from 'redux-saga';
+import axios from 'axios';
+import { GET_EMAIL_AUTH_CODE_REQUEST, CHECK_DUPLICATED_NICKNAME_REQUEST, SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
+import wrapper from '../../store/configureStore';
+
+/** css */
+const Background = styled.div`
+  position: relative;
+  background-color: #1d2327;
+  width: 100%;
+  height: 200%;
+`;
+
+const Logo = styled.h1`
+  position: absolute;
+  width: 234px;
+  margin: 0 auto;
+  top: 50%;
+  left: 50%;
+  margin-top: -255px;
+  margin-left: -117px;
+  color: white;
+  font-size: 45px;
+  & span {
+    color: #9400d3;
+  }
+`;
+
+const SignUpForm = styled(Form)`
+  position: absolute;
+  width: 510px;
+  height: 300px;
+  margin: 0 auto;
+  top: 50%;
+  left: 50%;
+  margin-top: -144px;
+  margin-left: -200px;
+  & label {
+    color: white;
+  }
+  & Input,
+  Button {
+    width: 400px;
+    height: 40px;
+    margin-bottom: 20px;
+  }
+`;
+
+const InputField = styled(Input)`
+  background: #1d2428;
+  border-radius: 4px;
+  color: #fff;
+
+  &.error {
+    margin-bottom: 5px;
+    border-bottom-style: solid;
+    border-bottom-color: #ffff00;
+    border-bottom-width: 5px;
+  }
+  &.pass {
+    margin-bottom: 5px;
+    border-bottom-style: solid;
+    border-bottom-color: #52c41a;
+    border-bottom-width: 5px;
+  }
+`;
+
+const InputError = styled.div`
+  color: #ffff00;
+  margin-bottom: 32px;
+`;
 
 const Signup = () => {
   const dispatch = useDispatch();
@@ -51,10 +121,10 @@ const Signup = () => {
   const PasswordInput = passwordRequiredError || passwordLengthError ? 'error' : null;
 
   useEffect(() => { // 로그인한 상태
-    if (me) {
+    if (me && me.id) {
       Router.replace('/');
     }
-  }, [me]);
+  }, [me && me.id]);
 
   useEffect(() => {
     if (signUpDone) {
@@ -364,5 +434,21 @@ const Signup = () => {
     </Background>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  // 쿠키
+  const cookie = context.req ? context.req.headers.cookie : '';
+  axios.defaults.headers.Cookie = '';
+
+  if (context.req && cookie) { // 프론트 서버가 한대라 브라우저들이 쿠키를 공유하게 되는 문제 예방
+    axios.defaults.headers.Cookie = cookie;
+
+    context.store.dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
+  }
+  context.store.dispatch(END);
+  await context.store.sagaTask.toPromise();
+});
 
 export default Signup;
