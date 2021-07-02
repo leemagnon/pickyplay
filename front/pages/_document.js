@@ -10,8 +10,9 @@ export default class MyDocument extends Document {
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: (App) => (props) =>
-            sheet.collectStyles(<App {...props} />),
+          enhanceApp: (App) => (props) => (
+            sheet.collectStyles(<App {...props} />)
+          )
         });
       const initialProps = await Document.getInitialProps(ctx);
       return {
@@ -46,10 +47,6 @@ export default class MyDocument extends Document {
         </body>
         <style jsx global>
           {`
-            html,
-            body {
-              margin: 0;
-            }
             #__next {
               position: absolute;
               top: 0;
