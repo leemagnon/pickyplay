@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react/jsx-props-no-spreading */
 /**
  * 모든 페이지에서 공통인 것은 _app.js에 넣는다. pages들의 공통 부분.
  */
