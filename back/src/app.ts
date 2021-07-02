@@ -33,7 +33,6 @@ class App {
 
   public listen() {
     this.app.listen(this.port, () => {
-      console.log(path.resolve(__dirname, 'config', 'config.ts'));
       console.log(`App listening on the port ${this.port}`);
     });
   }

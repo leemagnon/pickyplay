@@ -116,6 +116,7 @@ class AuthenticationService {
       encoding: 'base32',
       token: secondAuthData.twoFactorAuthenticationCode,
     });
+
     return {
       isCodeValid,
       user,
