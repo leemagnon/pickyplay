@@ -7,6 +7,8 @@ import logger from 'morgan';
 import cors from 'cors';
 import DB from 'src/models';
 import path from 'path';
+import helmet from 'helmet';
+import hpp from 'hpp';
 
 class App {
   public app: express.Application;
@@ -37,10 +39,16 @@ class App {
   }
 
   private initializeMiddlewares() {
-    this.app.use(logger('dev'));
+    if (process.env.NODE_ENV === 'production') {
+      this.app.use(logger('combined')); // 접속자의 ip도 알 수 있음.
+      this.app.use(hpp());
+      this.app.use(helmet());
+    } else {
+      this.app.use(logger('dev'));
+    }
     this.app.use(
       cors({
-        origin: 'http://localhost:3060',
+        origin: ['http://localhost:3060', 'pickyplay.com'],
         credentials: true,
       }),
     );
