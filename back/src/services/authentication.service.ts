@@ -124,9 +124,11 @@ class AuthenticationService {
   }
 
   public createCookie(tokenData: TokenData) {
-    return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}; Domain=${
-      process.env.NODE_ENV === 'production' && '.pickyplay.site'
-    }`;
+    if (process.env.NODE_ENV === 'production') {
+      return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}; Domain=.pickyplay.site`;
+    } else {
+      return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}`;
+    }
   }
 
   public createToken(user: User, isSecondFactorAuthenticated = false): TokenData {
