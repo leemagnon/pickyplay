@@ -123,7 +123,9 @@ class AuthenticationService {
   }
 
   public createCookie(tokenData: TokenData) {
-    return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}`;
+    return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}domain=${
+      process.env.NODE_ENV === 'production' && '.pickyplay.site'
+    }`;
   }
 
   public createToken(user: User, isSecondFactorAuthenticated = false): TokenData {

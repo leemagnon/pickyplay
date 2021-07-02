@@ -4,7 +4,9 @@ import axios from 'axios';
 import userSaga from './user';
 import movieSaga from './movie';
 
-axios.defaults.baseURL = 'http://localhost:5000';
+import { backUrl } from '../config/config';
+
+axios.defaults.baseURL = backUrl;
 axios.defaults.withCredentials = true;
 
 export default function* rootSaga() {

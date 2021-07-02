@@ -48,7 +48,7 @@ class App {
     }
     this.app.use(
       cors({
-        origin: ['http://localhost:3060', 'pickyplay.com'],
+        origin: ['http://localhost:3060', 'http://pickyplay.site'],
         credentials: true,
       }),
     );
