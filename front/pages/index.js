@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { END } from 'redux-saga';
 import axios from 'axios';
+
 import AppLayout from '../components/AppLayout';
 import wrapper from '../store/configureStore';
 import { LOAD_MY_INFO_REQUEST } from '../reducers/user';

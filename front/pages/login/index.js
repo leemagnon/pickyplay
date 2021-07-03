@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import Router from 'next/router';
@@ -8,7 +8,7 @@ import axios from 'axios';
 import { LOAD_QR_CODE_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
 import Modal from '../../components/Modal';
 import wrapper from '../../store/configureStore';
-
+import AppContext from '../../contexts/appContext';
 /** css */
 const Background = styled.div`
   position: relative;
@@ -140,6 +140,9 @@ const aTagStyle = {
 
 /* 로그인 컴포넌트 */
 const LogIn = () => {
+  const browserWidth = useContext(AppContext);
+  console.log('browserWidth : ', browserWidth);
+
   const dispatch = useDispatch();
   const { loadQRCodeDone,
     loadQRCodeError,

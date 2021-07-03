@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Input, Button } from 'antd';
 import Router from 'next/router';
@@ -7,23 +7,22 @@ import { END } from 'redux-saga';
 import axios from 'axios';
 import { GET_EMAIL_AUTH_CODE_REQUEST, CHECK_DUPLICATED_NICKNAME_REQUEST, SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
 import wrapper from '../../store/configureStore';
+import AppContext from '../../contexts/appContext';
 
 /** css */
 const Background = styled.div`
-  position: relative;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+
+  overflow-y: scroll;
+
   background-color: #1d2327;
-  width: 100%;
-  height: 200%;
 `;
 
 const Logo = styled.h1`
-  position: absolute;
-  width: 234px;
-  margin: 0 auto;
-  top: 50%;
-  left: 50%;
-  margin-top: -255px;
-  margin-left: -117px;
   color: white;
   font-size: 45px;
   & span {
@@ -32,20 +31,13 @@ const Logo = styled.h1`
 `;
 
 const SignUpForm = styled(Form)`
-  position: absolute;
-  width: 510px;
-  height: 300px;
-  margin: 0 auto;
-  top: 50%;
-  left: 50%;
-  margin-top: -144px;
-  margin-left: -200px;
+  width: ${({ browserWidth }) => (browserWidth >= 510 ? '510px' : `${browserWidth - 30}px`)};
+
   & label {
     color: white;
   }
   & Input,
   Button {
-    width: 400px;
     height: 40px;
     margin-bottom: 20px;
   }
@@ -77,6 +69,8 @@ const InputError = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
+  const browserWidth = useContext(AppContext);
+  console.log('browserWidth : ', browserWidth);
   const {
     getEmailAuthCodeLoading,
     checkDuplicatedNicknameLoading,
@@ -329,109 +323,109 @@ const Signup = () => {
     duplicatedNicknameCheckRequiredError]);
 
   return (
-    <Background>
-      <Logo className="font-carter-one">
-        <span>P</span>
-        ICKY
-        <span>P</span>
-        LAY
-      </Logo>
-      <SignUpForm onFinish={onSubmit}>
-        <div>
-          <label htmlFor="email">이메일</label>
-          <br />
-          <InputField
-            name="email"
-            className={EmailInput}
-            value={email}
-            onChange={onChangeEmail}
-            style={{ marginRight: 8 }}
-          />
-          {emailRequiredError && <InputError>이메일을 입력해야 합니다.</InputError>}
-          {emailValidationError && <InputError>이메일 형식이 틀렸습니다.</InputError>}
-          <Button
-            type="primary"
-            onClick={getEmailAuthCode}
-            loading={getEmailAuthCodeLoading}
-            style={{
-              backgroundColor: '#690096',
-              borderColor: '#690096',
-              width: 120,
-            }}
-          >
-            인증번호받기
-          </Button>
-        </div>
-        <div>
-          <label htmlFor="email">인증번호 입력</label>
-          <br />
-          <InputField name="email-authentication" className={UserEmailAuthCodeInput} value={userEmailAuthCode} onChange={onChangeUserEmailAuthCode} />
-          {userEmailAuthCodeRequiredError && <InputError>인증번호를 입력해야 합니다.</InputError>}
-          {userEmailAuthCodeValidationError && <InputError>인증번호가 틀렸습니다.</InputError>}
-        </div>
-        <div>
-          <label htmlFor="nickname">닉네임</label>
-          <br />
-          <InputField
-            name="nickname"
-            className={`${NicknameInput} ${nicknamePassMsg ? 'pass' : ''}`}
-            value={nickname}
-            onChange={onChangeNickname}
-            style={{ marginRight: 8 }}
-          />
-          {nicknameRequiredError && <InputError>닉네임을 입력해야 합니다.</InputError>}
-          {nicknameValidationError && <InputError>닉네임은 2자~10자 사이여야 합니다.</InputError>}
-          {nicknamePassMsg && <div style={{ color: '#52c41a', marginBottom: '32px' }}>사용할 수 있는 닉네임 입니다.</div>}
-          {duplicatedNicknameCheckRequiredError && <InputError>닉네임 중복 여부를 확인해야 합니다.</InputError>}
-          <Button
-            type="primary"
-            onClick={checkDuplicatedNickname}
-            loading={checkDuplicatedNicknameLoading}
-            style={{
-              backgroundColor: '#690096',
-              borderColor: '#690096',
-              width: 120,
-            }}
-          >
-            닉네임중복확인
-          </Button>
-        </div>
-        <div>
-          <label htmlFor="password">비밀번호</label>
-          <br />
-          <InputField
-            type="password"
-            name="password"
-            className={PasswordInput}
-            value={password}
-            onChange={onChangePassword}
-          />
-          {passwordRequiredError && <InputError>비밀번호를 입력해야 합니다.</InputError>}
-          {passwordLengthError && <InputError>영문/숫자/특수문자 포함, 8자~20자</InputError>}
-        </div>
-        <div>
-          <label htmlFor="password-check">비밀번호 재확인</label>
-          <br />
-          <InputField type="password" name="password-check" className={PasswordCheckInput} value={passwordCheck} onChange={onChangePasswordCheck} />
-          {passwordCheckRequiredError && <InputError>비밀번호를 재확인해야 합니다.</InputError>}
-          {passwordCheckError && <InputError>비밀번호가 일치하지 않습니다.</InputError>}
-        </div>
-        <div>
+    <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
+      <Background>
+        <Logo className="font-carter-one">
+          <span>P</span>
+          ICKY
+          <span>P</span>
+          LAY
+        </Logo>
+        <SignUpForm browserWidth={browserWidth} onFinish={onSubmit}>
+          <div>
+            <label htmlFor="email">이메일</label>
+            <br />
+            <InputField
+              name="email"
+              className={EmailInput}
+              value={email}
+              onChange={onChangeEmail}
+              style={{ marginRight: 8 }}
+            />
+            {emailRequiredError && <InputError>이메일을 입력해야 합니다.</InputError>}
+            {emailValidationError && <InputError>이메일 형식이 틀렸습니다.</InputError>}
+            <Button
+              type="primary"
+              onClick={getEmailAuthCode}
+              loading={getEmailAuthCodeLoading}
+              style={{
+                backgroundColor: '#690096',
+                borderColor: '#690096',
+              }}
+            >
+              인증번호받기
+            </Button>
+          </div>
+          <div>
+            <label htmlFor="email">인증번호 입력</label>
+            <br />
+            <InputField name="email-authentication" className={UserEmailAuthCodeInput} value={userEmailAuthCode} onChange={onChangeUserEmailAuthCode} />
+            {userEmailAuthCodeRequiredError && <InputError>인증번호를 입력해야 합니다.</InputError>}
+            {userEmailAuthCodeValidationError && <InputError>인증번호가 틀렸습니다.</InputError>}
+          </div>
+          <div>
+            <label htmlFor="nickname">닉네임</label>
+            <br />
+            <InputField
+              name="nickname"
+              className={`${NicknameInput} ${nicknamePassMsg ? 'pass' : ''}`}
+              value={nickname}
+              onChange={onChangeNickname}
+              style={{ marginRight: 8 }}
+            />
+            {nicknameRequiredError && <InputError>닉네임을 입력해야 합니다.</InputError>}
+            {nicknameValidationError && <InputError>닉네임은 2자~10자 사이여야 합니다.</InputError>}
+            {nicknamePassMsg && <div style={{ color: '#52c41a', marginBottom: '32px' }}>사용할 수 있는 닉네임 입니다.</div>}
+            {duplicatedNicknameCheckRequiredError && <InputError>닉네임 중복 여부를 확인해야 합니다.</InputError>}
+            <Button
+              type="primary"
+              onClick={checkDuplicatedNickname}
+              loading={checkDuplicatedNicknameLoading}
+              style={{
+                backgroundColor: '#690096',
+                borderColor: '#690096',
+              }}
+            >
+              닉네임중복확인
+            </Button>
+          </div>
+          <div>
+            <label htmlFor="password">비밀번호</label>
+            <br />
+            <InputField
+              type="password"
+              name="password"
+              className={PasswordInput}
+              value={password}
+              onChange={onChangePassword}
+            />
+            {passwordRequiredError && <InputError>비밀번호를 입력해야 합니다.</InputError>}
+            {passwordLengthError && <InputError>영문/숫자/특수문자 포함, 8자~20자</InputError>}
+          </div>
+          <div>
+            <label htmlFor="password-check">비밀번호 재확인</label>
+            <br />
+            <InputField type="password" name="password-check" className={PasswordCheckInput} value={passwordCheck} onChange={onChangePasswordCheck} />
+            {passwordCheckRequiredError && <InputError>비밀번호를 재확인해야 합니다.</InputError>}
+            {passwordCheckError && <InputError>비밀번호가 일치하지 않습니다.</InputError>}
+          </div>
+
           <Button
             type="primary"
             htmlType="submit"
             loading={signUpLoading}
             style={{
-              width: '400px',
               backgroundColor: '#690096',
               borderColor: '#690096',
+              width: '100%',
             }}
           >
             가입하기
           </Button>
-        </div>
-      </SignUpForm>
-    </Background>
+
+        </SignUpForm>
+      </Background>
+    </div>
   );
 };
 

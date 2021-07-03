@@ -1,13 +1,14 @@
 /**
  * 모든 페이지에서 공통인 것은 _app.js에 넣는다. pages들의 공통 부분.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head'; // head를 수정할 수 있게 Head 컴포넌트 제공
 import { createGlobalStyle } from 'styled-components';
 import 'antd/dist/antd.css'; // 웹팩이 알아서 style 태그로 변경해서 처리해줌.
 import wrapper from '../store/configureStore';
 import '../styles.css';
+import { AppProvider } from '../contexts/appContext';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -17,17 +18,31 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const PickyPlay = ({ Component }) => (
-  <>
-    <GlobalStyle />
-    <Head>
-      <link rel="icon" type="image/svg+xml" sizes="any" href="/popcorn.svg" />
-      <meta charSet="utf-8" />
-      <title>PickyPlay</title>
-    </Head>
-    <Component />
-  </>
-);
+const PickyPlay = ({ Component }) => {
+  const [browserWidth, setBrowserWidth] = useState(null);
+
+  useEffect(() => {
+    setBrowserWidth(window.innerWidth);
+
+    window.addEventListener('resize', () => {
+      setBrowserWidth(window.innerWidth);
+    });
+  }, []);
+
+  return (
+    <>
+      <GlobalStyle />
+      <Head>
+        <link rel="icon" type="image/svg+xml" sizes="any" href="/popcorn.svg" />
+        <meta charSet="utf-8" />
+        <title>PickyPlay</title>
+      </Head>
+      <AppProvider value={browserWidth}>
+        <Component />
+      </AppProvider>
+    </>
+  );
+};
 
 PickyPlay.propTypes = {
   Component: PropTypes.elementType.isRequired, // <Component />처럼 JSX로 쓸 수 있는 것들을 elementType이라고 한다.
