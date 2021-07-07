@@ -13,10 +13,9 @@ import DataStoredInToken from 'src/interfaces/dataStoredInToken.interface';
 import UserWithThatEmailAlreadyExistsException from 'src/exceptions/UserWithThatEmailAlreadyExistsException';
 import WrongCredentialException from 'src/exceptions/WrongCredentialException';
 import DuplicatedNicknameException from 'src/exceptions/DuplicatedNicknameException';
-import speakeasy from 'speakeasy';
-import QRCode from 'qrcode';
 import { Response } from 'express';
 import nodemailer from 'nodemailer';
+import speakeasy from 'speakeasy';
 
 class AuthenticationService {
   public user = userModel;
@@ -72,40 +71,19 @@ class AuthenticationService {
     }
   }
 
-  public async loggingIn(logInData: LogInDto, res: Response) {
+  public async loggingIn(logInData: LogInDto) {
     const user = await this.user.findOne({ where: { email: logInData.email } });
     if (user) {
       const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
       if (isPasswordMatching) {
-        const { otpauthUrl, base32 } = this.getTwoFactorAuthenticationCode();
-        await this.user.update(
-          {
-            twoFactorAuthenticationCode: base32,
-          },
-          { where: { id: user.id } },
-        );
-        return otpauthUrl;
+        const result = !user.twoFactorAuthenticationCode ? user : 'Activate 2FA';
+        return result;
       } else {
         throw new WrongCredentialException();
       }
     } else {
       throw new WrongCredentialException();
     }
-  }
-
-  /* 2단계 인증 */
-  private getTwoFactorAuthenticationCode() {
-    const secretCode = speakeasy.generateSecret({
-      name: process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME,
-    });
-    return {
-      otpauthUrl: secretCode.otpauth_url, // QR Code 생성에 사용. Google Authenticator와 양립하는 One Time Password Authentication (OTPA).
-      base32: secretCode.base32, // 사용자 신원 검증
-    };
-  }
-
-  public generateQRCodeURL(data: string) {
-    return QRCode.toDataURL(data);
   }
 
   // 사용자가 Google OTP에서 얻은 1회용 패스워드가 DB에 저장된 secret code와 일치하는지 검증한다.
@@ -131,11 +109,10 @@ class AuthenticationService {
     }
   }
 
-  public createToken(user: User, isSecondFactorAuthenticated = false): TokenData {
+  public createToken(user: User): TokenData {
     const expiresIn = 60 * 60; // an hour
     const secret = process.env.JWT_SECRET;
     const dataStoredInToken: DataStoredInToken = {
-      isSecondFactorAuthenticated,
       id: user.id,
     };
     return {

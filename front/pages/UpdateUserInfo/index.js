@@ -1,36 +1,32 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
+import React, { useMemo, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
+import Intro from '../../components/Intro';
+import Activate2FA from '../../components/Activate2FA';
+import UpdateProfile from '../../components/UpdateProfile';
+import UpdateEmail from '../../components/UpdateEmail';
+import UpdatePassword from '../../components/UpdatePassword';
 
-import React from 'react';
-import styled from 'styled-components';
+const UpdateUserInfo = () => {
+  const { me } = useSelector((state) => state.user);
+  const router = useRouter();
+  const component = useMemo(() => (router.query.component !== undefined ? router.query.component : 'Intro'), [router.query]);
 
-const Content = styled.div`
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 500px;
-    height: 500px;
-    border: 1px solid #dadada;
-    border-radius: 2px;
-`;
+  useEffect(() => {
+    if (!me) {
+      router.replace('/');
+    }
+  }, [me]);
 
-const UpdateUserInfo = () => (
-  <div style={{ backgroundColor: 'pink', height: '100%' }}>
-    <Content>
-      <div className="header">프로필 변경</div>
-      <p><a href="">수정</a></p>
-    </Content>
-    <Content>
-      <div className="header">이메일 변경</div>
-      <p><a href="">수정</a></p>
-    </Content>
-    <Content>
-      <div className="header">비밀번호 변경</div>
-      <p><a href="">수정</a></p>
-    </Content>
-
-  </div>
-);
+  return (
+    <>
+      {component === 'Intro' && <Intro />}
+      {component === 'Activate2FA' && <Activate2FA />}
+      {component === 'UpdateProfile' && <UpdateProfile />}
+      {component === 'UpdateEmail' && <UpdateEmail />}
+      {component === 'UpdatePassword' && <UpdatePassword />}
+    </>
+  );
+};
 
 export default UpdateUserInfo;

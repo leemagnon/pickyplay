@@ -2,23 +2,16 @@ import produce from 'immer';
 
 export const initialState = {
   emailAuthCode: '',
-  QRCode: '',
-  msg: '', // 닉네임 중복 검사 메시지
   getEmailAuthCodeLoading: false, // 이메일 인증 번호 받아오기 시도중
   getEmailAuthCodeDone: false,
   getEmailAuthCodeError: null,
-  checkDuplicatedNicknameLoading: false, // 닉네임 중복 검사중
-  checkDuplicatedNicknameDone: false,
-  checkDuplicatedNicknameError: null,
   secondAuthLoading: false, // 2FA 시도중
   secondAuthDone: false,
   secondAuthError: null,
   logInLoading: false, // 로그인 시도중
   logInDone: false,
   logInError: null,
-  loadQRCodeLoading: false, // QR Code 불러오기 시도중
-  loadQRCodeDone: false,
-  loadQRCodeError: null,
+  activate2FA: false, // 2FA 활성화
   loadMyInfoLoading: false, // 유저 정보 가져오기 시도중
   loadMyInfoDone: false,
   loadMyInfoError: null,
@@ -39,25 +32,17 @@ export const GET_EMAIL_AUTH_CODE_REQUEST = 'GET_EMAIL_AUTH_CODE_REQUEST';
 export const GET_EMAIL_AUTH_CODE_SUCCESS = 'GET_EMAIL_AUTH_CODE_SUCCESS';
 export const GET_EMAIL_AUTH_CODE_FAILURE = 'GET_EMAIL_AUTH_CODE_FAILURE';
 
-export const CHECK_DUPLICATED_NICKNAME_REQUEST = 'CHECK_DUPLICATED_NICKNAME_REQUEST';
-export const CHECK_DUPLICATED_NICKNAME_SUCCESS = 'CHECK_DUPLICATED_NICKNAME_SUCCESS';
-export const CHECK_DUPLICATED_NICKNAME_FAILURE = 'CHECK_DUPLICATED_NICKNAME_FAILURE';
+export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
+export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
+export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 
 export const SECOND_AUTH_REQUEST = 'SECOND_AUTH_REQUEST';
 export const SECOND_AUTH_SUCCESS = 'SECOND_AUTH_SUCCESS';
 export const SECOND_AUTH_FAILURE = 'SECOND_AUTH_FAILURE';
 
-export const LOAD_QR_CODE_REQUEST = 'LOAD_QR_CODE_REQUEST';
-export const LOAD_QR_CODE_SUCCESS = 'LOAD_QR_CODE_SUCCESS';
-export const LOAD_QR_CODE_FAILURE = 'LOAD_QR_CODE_FAILURE';
-
 export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
 export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
-
-export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
-export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
-export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 
 export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
 export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
@@ -88,22 +73,6 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.getEmailAuthCodeDone = false;
       draft.getEmailAuthCodeError = action.error;
       break;
-    case CHECK_DUPLICATED_NICKNAME_REQUEST:
-      draft.checkDuplicatedNicknameLoading = true;
-      draft.checkDuplicatedNicknameDone = false;
-      draft.checkDuplicatedNicknameError = null;
-      draft.msg = null;
-      break;
-    case CHECK_DUPLICATED_NICKNAME_SUCCESS:
-      draft.checkDuplicatedNicknameLoading = false;
-      draft.checkDuplicatedNicknameDone = true;
-      draft.msg = action.data;
-      break;
-    case CHECK_DUPLICATED_NICKNAME_FAILURE:
-      draft.checkDuplicatedNicknameLoading = false;
-      draft.checkDuplicatedNicknameDone = false;
-      draft.checkDuplicatedNicknameError = action.error;
-      break;
     case SECOND_AUTH_REQUEST:
       draft.secondAuthLoading = true;
       draft.secondAuthDone = false;
@@ -113,27 +82,11 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.secondAuthLoading = false;
       draft.secondAuthDone = true;
       draft.me = action.data;
-      draft.QRCode = '';
       break;
     case SECOND_AUTH_FAILURE:
       draft.secondAuthLoading = false;
       draft.secondAuthDone = false;
       draft.secondAuthError = action.error;
-      break;
-    case LOAD_QR_CODE_REQUEST:
-      draft.loadQRCodeLoading = true;
-      draft.loadQRCodeDone = false;
-      draft.loadQRCodeError = null;
-      break;
-    case LOAD_QR_CODE_SUCCESS:
-      draft.loadQRCodeLoading = false;
-      draft.loadQRCodeDone = true;
-      draft.QRCode = action.data;
-      break;
-    case LOAD_QR_CODE_FAILURE:
-      draft.loadQRCodeLoading = false;
-      draft.loadQRCodeDone = false;
-      draft.loadQRCodeError = action.error;
       break;
     case LOAD_MY_INFO_REQUEST:
       draft.loadMyInfoLoading = true;
@@ -157,7 +110,11 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOG_IN_SUCCESS:
       draft.logInLoading = false;
       draft.logInDone = true;
-      draft.me = action.data;
+      if (action.data === 'Activate 2FA') {
+        draft.activate2FA = true;
+      } else {
+        draft.me = action.data;
+      }
       break;
     case LOG_IN_FAILURE:
       draft.logInLoading = false;
@@ -186,8 +143,6 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case SIGN_UP_SUCCESS:
       draft.signUpLoading = false;
       draft.signUpDone = true;
-      draft.emailAuthCode = '';
-      draft.msg = '';
       break;
     case SIGN_UP_FAILURE:
       draft.signUpLoading = false;

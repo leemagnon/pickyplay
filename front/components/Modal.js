@@ -79,7 +79,7 @@ const OTPButton = styled.button`
   }
 `;
 
-const Modal = ({ setShowQRCodeModal, QRCode, email }) => {
+const Modal = ({ setShowQRCodeModal, email }) => {
   const dispatch = useDispatch();
   const [twoFactorAuthenticationCode, setTwoFactorAuthenticationCode] = useState('');
 
@@ -107,7 +107,6 @@ const Modal = ({ setShowQRCodeModal, QRCode, email }) => {
       <div>
         <CloseModalButton onClick={onCloseModal}>&times;</CloseModalButton>
         <form onSubmit={onSubmit}>
-          <img src={QRCode} alt="" style={{ width: '170px', height: '170px' }} />
           <div>
             <OTPInput
               id="secondAuthData"
@@ -126,7 +125,6 @@ const Modal = ({ setShowQRCodeModal, QRCode, email }) => {
 
 Modal.propTypes = {
   setShowQRCodeModal: PropTypes.bool.isRequired,
-  QRCode: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
 };
 

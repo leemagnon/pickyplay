@@ -5,10 +5,11 @@ import Router from 'next/router';
 import styled from 'styled-components';
 import { END } from 'redux-saga';
 import axios from 'axios';
-import { LOAD_QR_CODE_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
+import { LOG_IN_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
 import Modal from '../../components/Modal';
 import wrapper from '../../store/configureStore';
 import AppContext from '../../contexts/appContext';
+
 /** css */
 const Background = styled.div`
   position: relative;
@@ -144,11 +145,12 @@ const LogIn = () => {
   console.log('browserWidth : ', browserWidth);
 
   const dispatch = useDispatch();
-  const { loadQRCodeDone,
-    loadQRCodeError,
-    QRCode,
-    secondAuthDone,
-    me } = useSelector((state) => state.user);
+  const {
+    logInError,
+    activate2FA,
+    secondAuthError,
+    me,
+  } = useSelector((state) => state.user);
   const [email, setEmail] = useState('');
   const [emailRequiredError, setEmailRequiredError] = useState(false);
   const [password, setPassword] = useState('');
@@ -164,23 +166,23 @@ const LogIn = () => {
     }
   }, [me && me.id]);
 
+  useEffect(() => { // 로그인 에러
+    if (logInError) {
+      alert(logInError.message);
+    }
+  }, [logInError]);
+
   useEffect(() => { // 2fa
-    if (secondAuthDone) {
-      Router.replace('/');
+    if (secondAuthError) {
+      alert(secondAuthError.message);
     }
-  }, [secondAuthDone]);
+  }, [secondAuthError]);
 
   useEffect(() => {
-    if (loadQRCodeError) {
-      alert(loadQRCodeError.message);
-    }
-  }, [loadQRCodeError]);
-
-  useEffect(() => {
-    if (loadQRCodeDone) {
+    if (activate2FA) {
       setShowQRCodeModal(true);
     }
-  }, [loadQRCodeDone]);
+  }, [activate2FA]);
 
   const onChangeEmail = useCallback((e) => {
     setEmail(e.target.value);
@@ -212,7 +214,7 @@ const LogIn = () => {
     console.log(email, password);
 
     dispatch({
-      type: LOAD_QR_CODE_REQUEST,
+      type: LOG_IN_REQUEST,
       data: { email, password },
     });
   }, [email, password]);
@@ -270,7 +272,7 @@ const LogIn = () => {
         </SignUp>
       </LogInBody>
       {showQRCodeModal && (
-      <Modal setShowQRCodeModal={setShowQRCodeModal} QRCode={QRCode} email={email} />
+      <Modal setShowQRCodeModal={setShowQRCodeModal} email={email} />
       )}
       <Footer className="font-nanum-gothic">
         <div style={{ minWidth: '929px' }}>

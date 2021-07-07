@@ -10,6 +10,7 @@ import {
   BeforeUpdate,
   BeforeCreate,
   AllowNull,
+  Default,
 } from 'sequelize-typescript';
 
 @Table
@@ -28,16 +29,18 @@ export default class User extends Model {
   @Column(DataType.STRING)
   twoFactorAuthenticationCode: string;
 
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  is2FAOn: boolean;
+
   @Length({ min: 2, max: 10 })
+  @AllowNull(false)
   @Unique
   @Column
   nickname: string;
 
   @Column(DataType.STRING)
   profileImgUrl: string;
-
-  @Column(DataType.TEXT)
-  introWords: string;
 
   @BeforeUpdate
   @BeforeCreate

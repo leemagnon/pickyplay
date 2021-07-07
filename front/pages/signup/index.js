@@ -5,7 +5,7 @@ import Router from 'next/router';
 import styled from 'styled-components';
 import { END } from 'redux-saga';
 import axios from 'axios';
-import { GET_EMAIL_AUTH_CODE_REQUEST, CHECK_DUPLICATED_NICKNAME_REQUEST, SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
+import { SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
 import wrapper from '../../store/configureStore';
 import AppContext from '../../contexts/appContext';
 
@@ -78,13 +78,12 @@ const Signup = () => {
     signUpLoading,
     signUpDone,
     signUpError,
-    emailAuthCode,
-    msg,
     me,
   } = useSelector((state) => state.user);
   const [email, setEmail] = useState('');
   const [emailRequiredError, setEmailRequiredError] = useState(false);
   const [emailValidationError, setEmailValidationError] = useState(false);
+  const [emailAuthCode, setEmailAuthCode] = useState('');
   const [userEmailAuthCode, setUserEmailAuthCode] = useState(''); // 사용자가 입력한 인증 번호
   const [userEmailAuthCodeRequiredError, setUserEmailAuthCodeRequiredError] = useState(false);
   const [userEmailAuthCodeValidationError, setUserEmailAuthCodeValidationError] = useState(false);
@@ -95,7 +94,7 @@ const Signup = () => {
     duplicatedNicknameCheckRequiredError,
     setDuplicatedNicknameCheckRequiredError,
   ] = useState(false);
-  const [nicknamePassMsg, setNicknamePassMsg] = useState(false);
+  const [nicknamePassMsg, setNicknamePassMsg] = useState('');
   const [password, setPassword] = useState('');
   const [passwordRequiredError, setPasswordRequiredError] = useState(false);
   const [passwordLengthError, setPasswordLengthError] = useState(false);
@@ -139,18 +138,15 @@ const Signup = () => {
   }, [checkDuplicatedNicknameError]);
 
   useEffect(() => {
-    if (msg) { // 닉네임 중복 검사 통과 메시지
+    if (nicknamePassMsg !== '') { // 닉네임 중복 검사 통과 메시지
       setDuplicatedNicknameCheckRequiredError(false);
       setNicknameValidationError(false);
       setNicknameRequiredError(false);
-      setNicknamePassMsg(true);
     }
-  }, [msg]);
+  }, [nicknamePassMsg]);
 
   const getEmailAuthCode = useCallback(
-    () => {
-      setNicknamePassMsg(false); // 닉네임 중복 통과 초기화
-
+    async () => {
       if (!email) {
         setEmailRequiredError(true);
         setEmailValidationError(false);
@@ -160,36 +156,38 @@ const Signup = () => {
         return 0;
       }
 
-      return dispatch({
-        type: GET_EMAIL_AUTH_CODE_REQUEST,
-        data: email,
+      const result = await axios.post('/auth/emailAuthCode', {
+        email,
       });
+
+      setEmailAuthCode(result.data);
     },
-    [email],
+    [email, emailValidationError],
   );
 
   const checkDuplicatedNickname = useCallback(
-    () => {
+    async () => {
       setDuplicatedNicknameCheckRequiredError(false);
 
       if (!nickname) {
         setNicknameRequiredError(true);
         setNicknameValidationError(false);
-        setNicknamePassMsg(false);
+        setNicknamePassMsg('');
         return 0;
       }
 
       if (nicknameValidationError) {
         setNicknameRequiredError(false);
-        setNicknamePassMsg(false);
+        setNicknamePassMsg('');
         return 0;
       }
 
-      return dispatch({
-        type: CHECK_DUPLICATED_NICKNAME_REQUEST,
-        data: nickname,
+      const result = await axios.post('/auth/nickname', {
+        nickname,
       });
-    }, [nickname, duplicatedNicknameCheckRequiredError],
+
+      setNicknamePassMsg(result.data);
+    }, [nickname, nicknameValidationError],
   );
 
   const onChangeEmail = useCallback((e) => {
@@ -214,18 +212,17 @@ const Signup = () => {
   }, [userEmailAuthCode]);
 
   const onChangeNickname = useCallback((e) => {
+    setNicknamePassMsg('');
     setNickname(e.target.value);
 
     if (e.target.value !== '') {
       setNicknameRequiredError(false);
-      setNicknamePassMsg(false);
       setDuplicatedNicknameCheckRequiredError(true);
     }
 
     if (!nicknameRule.test(e.target.value)) {
       setNicknameValidationError(true);
       setNicknameRequiredError(false);
-      setNicknamePassMsg(false);
       setDuplicatedNicknameCheckRequiredError(false);
     } else {
       setNicknameValidationError(false);
@@ -296,7 +293,7 @@ const Signup = () => {
       return setNicknameValidationError(true);
     }
 
-    if (duplicatedNicknameCheckRequiredError || !msg) {
+    if (duplicatedNicknameCheckRequiredError || nicknamePassMsg === '') {
       setNicknameRequiredError(false);
       setNicknameValidationError(false);
       return setDuplicatedNicknameCheckRequiredError(true);
@@ -319,7 +316,7 @@ const Signup = () => {
     nickname,
     password,
     passwordCheck,
-    msg,
+    nicknamePassMsg,
     duplicatedNicknameCheckRequiredError]);
 
   return (
@@ -375,7 +372,7 @@ const Signup = () => {
             />
             {nicknameRequiredError && <InputError>닉네임을 입력해야 합니다.</InputError>}
             {nicknameValidationError && <InputError>닉네임은 2자~10자 사이여야 합니다.</InputError>}
-            {nicknamePassMsg && <div style={{ color: '#52c41a', marginBottom: '32px' }}>사용할 수 있는 닉네임 입니다.</div>}
+            {nicknamePassMsg !== '' && <div style={{ color: '#52c41a', marginBottom: '32px' }}>{nicknamePassMsg}</div>}
             {duplicatedNicknameCheckRequiredError && <InputError>닉네임 중복 여부를 확인해야 합니다.</InputError>}
             <Button
               type="primary"

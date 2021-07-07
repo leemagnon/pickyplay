@@ -4,12 +4,9 @@ import {
   GET_EMAIL_AUTH_CODE_REQUEST,
   GET_EMAIL_AUTH_CODE_SUCCESS,
   GET_EMAIL_AUTH_CODE_FAILURE,
-  CHECK_DUPLICATED_NICKNAME_REQUEST,
-  CHECK_DUPLICATED_NICKNAME_SUCCESS,
-  CHECK_DUPLICATED_NICKNAME_FAILURE,
-  LOAD_QR_CODE_REQUEST,
-  LOAD_QR_CODE_SUCCESS,
-  LOAD_QR_CODE_FAILURE,
+  LOG_IN_REQUEST,
+  LOG_IN_SUCCESS,
+  LOG_IN_FAILURE,
   LOAD_MY_INFO_REQUEST,
   LOAD_MY_INFO_SUCCESS,
   LOAD_MY_INFO_FAILURE,
@@ -66,41 +63,20 @@ function* getEmailAuthCode(action) {
   }
 }
 
-function checkDuplicatedNicknameAPI(data) {
-  return axios.post('/auth/nickname', {
-    nickname: data,
-  });
-}
-
-function* checkDuplicatedNickname(action) {
-  try {
-    const result = yield call(checkDuplicatedNicknameAPI, action.data);
-    yield put({
-      type: CHECK_DUPLICATED_NICKNAME_SUCCESS,
-      data: result.data,
-    });
-  } catch (err) {
-    yield put({
-      type: CHECK_DUPLICATED_NICKNAME_FAILURE,
-      error: err.response.data,
-    });
-  }
-}
-
-function loadQRCodeAPI(data) {
+function logInAPI(data) {
   return axios.post('/auth/login', data);
 }
 
-function* loadQRCode(action) {
+function* logIn(action) {
   try {
-    const result = yield call(loadQRCodeAPI, action.data);
+    const result = yield call(logInAPI, action.data);
     yield put({
-      type: LOAD_QR_CODE_SUCCESS,
+      type: LOG_IN_SUCCESS,
       data: result.data,
     });
   } catch (err) {
     yield put({
-      type: LOAD_QR_CODE_FAILURE,
+      type: LOG_IN_FAILURE,
       error: err.response.data,
     });
   }
@@ -191,11 +167,8 @@ function* watchLogOut() {
 function* watchGetEmailAuthCode() {
   yield takeLatest(GET_EMAIL_AUTH_CODE_REQUEST, getEmailAuthCode);
 }
-function* watchCheckDuplicatedNickname() {
-  yield takeLatest(CHECK_DUPLICATED_NICKNAME_REQUEST, checkDuplicatedNickname);
-}
-function* watchLoadQRCode() {
-  yield takeLatest(LOAD_QR_CODE_REQUEST, loadQRCode);
+function* watchLogIn() {
+  yield takeLatest(LOG_IN_REQUEST, logIn);
 }
 function* watchSecondAuth() {
   yield takeLatest(SECOND_AUTH_REQUEST, secondAuth);
@@ -214,8 +187,7 @@ export default function* userSaga() {
   yield all([
     fork(watchLogOut),
     fork(watchGetEmailAuthCode),
-    fork(watchCheckDuplicatedNickname),
-    fork(watchLoadQRCode), // 로그인
+    fork(watchLogIn),
     fork(watchSecondAuth),
     fork(watchLoadMyInfo),
     fork(watchSignUp),

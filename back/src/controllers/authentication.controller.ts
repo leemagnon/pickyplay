@@ -5,33 +5,17 @@ import LogInDto from 'src/dtos/login.dto';
 import SecondAuthDto from 'src/dtos/secondAuth.dto';
 import EmailDto from 'src/dtos/email.dto';
 import AuthenticationService from 'src/services/authentication.service';
+import UserService from 'src/services/user.service';
 import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 import authMiddleware from 'src/middleware/auth.middleware';
-import WrongAuthenticationTokenException from 'src/exceptions/WrongAuthenticationTokenException';
 import randomBytes from 'randombytes';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import WrongOTPException from 'src/exceptions/WrongOTPException';
 
 class AuthenticationController implements Controller {
   public path = '/auth';
   public router = express.Router();
   private authenticationService = new AuthenticationService();
-
-  private upload = multer({
-    storage: multer.diskStorage({
-      destination(req, file, done) {
-        done(null, 'uploads');
-      },
-      filename(req, file, done) {
-        // 쥐돌이.png
-        const ext = path.extname(file.originalname); // 확장자 추출(.png)
-        const basename = path.basename(file.originalname, ext); // 쥐돌이
-        done(null, basename + '_' + new Date().getTime() + ext);
-      },
-    }),
-    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
-  });
+  private userService = new UserService();
 
   constructor() {
     this.initializeRoutes();
@@ -45,10 +29,6 @@ class AuthenticationController implements Controller {
     this.router.post(`${this.path}/login`, this.loggingIn);
     this.router.post(`${this.path}/2fa/authenticate`, this.secondFactorAuthentication);
     this.router.post(`${this.path}/logout`, authMiddleware, this.loggingOut);
-    // 회원 정보 수정
-    this.router.post(`${this.path}/newEmail`, this.updateEmail);
-    this.router.post(`${this.path}/newPassword`, this.updatePassword);
-    this.router.post(`${this.path}/newProfile`, this.upload.single('profileImg'), this.updateProfile);
   }
 
   private getMyInfo = async (req: RequestWithUser, res: Response, next: NextFunction) => {
@@ -90,7 +70,6 @@ class AuthenticationController implements Controller {
 
   private checkDuplicatedNickname = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body);
       const msg = await this.authenticationService.checkDuplicatedNickname(req.body.nickname);
       res.status(200).send(msg);
     } catch (error) {
@@ -102,9 +81,12 @@ class AuthenticationController implements Controller {
   private loggingIn = async (req: Request, res: Response, next: NextFunction) => {
     const logInData: LogInDto = req.body;
     try {
-      const otpauthUrl = await this.authenticationService.loggingIn(logInData, res);
-      const url = await this.authenticationService.generateQRCodeURL(otpauthUrl);
-      res.status(200).send(url);
+      const result = await this.authenticationService.loggingIn(logInData);
+      if (result !== 'Activate 2FA') {
+        const tokenData = await this.authenticationService.createToken(result);
+        res.setHeader('Set-Cookie', [this.authenticationService.createCookie(tokenData)]);
+      }
+      res.status(200).send(result);
     } catch (error) {
       console.error(error);
       next(error);
@@ -115,13 +97,19 @@ class AuthenticationController implements Controller {
     const secondAuthData: SecondAuthDto = req.body;
     const { isCodeValid, user } = await this.authenticationService.verifyTwoFactorAuthenticationCode(secondAuthData);
     if (isCodeValid) {
-      const tokenData = this.authenticationService.createToken(user, true);
+      if (secondAuthData.isActivate2FAPage) {
+        await this.userService.enable2FA(req.user);
+      }
+      if (secondAuthData.isDeactivate2FAPage) {
+        await this.userService.disable2FA(req.user);
+      }
+      const tokenData = this.authenticationService.createToken(user);
       user.password = undefined;
       user.twoFactorAuthenticationCode = undefined;
       res.setHeader('Set-Cookie', [this.authenticationService.createCookie(tokenData)]);
-      res.send(user);
+      res.status(200).send(user);
     } else {
-      next(new WrongAuthenticationTokenException());
+      next(new WrongOTPException());
     }
   };
 
@@ -135,35 +123,6 @@ class AuthenticationController implements Controller {
 
       res.status(200).send('ok');
     } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
-
-  private updateEmail = (req: Request, res: Response, next: NextFunction) => {
-    try {
-      console.log(req.body);
-    } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
-
-  private updatePassword = (req: Request, res: Response, next: NextFunction) => {
-    try {
-      console.log(req.body);
-    } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
-
-  private updateProfile = (req: Request, res: Response, next: NextFunction) => {
-    try {
-      fs.accessSync('uploads');
-      console.log(req.files);
-    } catch (error) {
-      fs.mkdirSync('uploads'); // 업로드 폴더가 없으므로 생성
       console.error(error);
       next(error);
     }

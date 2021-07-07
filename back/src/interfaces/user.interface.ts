@@ -3,9 +3,9 @@ interface User {
   email: string;
   password: string;
   twoFactorAuthenticationCode: string;
+  is2FAOn: boolean;
   nickname: string;
   profileImgUrl: string;
-  introWords: string;
 }
 
 export default User;

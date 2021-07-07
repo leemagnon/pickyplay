@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import Slider from 'react-slick';
 import styled, { createGlobalStyle } from 'styled-components';
 import Menu from './Menu';
@@ -126,6 +126,7 @@ const MenuButton = styled.button`
 
 const AppLayout = ({ children }) => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { me } = useSelector((state) => state.user);
   const { randomMovie, loadRandomMovieDone, searchedMovies } = useSelector((state) => state.movie);
   const [isHome, setIsHome] = useState(true);
@@ -226,8 +227,8 @@ const AppLayout = ({ children }) => {
                     <img src={gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} style={{borderRadius: '5px'}} />
                     <div id="profile-name">{me.nickname}</div> 
                   </ProfileModal>
-                  <MenuButton onClick={() => Router.replace('/MyMovies')}>무비컬렉션</MenuButton>
-                  <MenuButton onClick={() => Router.replace('/UpdateUserInfo')}>회원정보수정</MenuButton>
+                  <MenuButton onClick={() => router.replace('/MyMovies')}>무비컬렉션</MenuButton>
+                  <MenuButton onClick={() => router.replace('/UpdateUserInfo')}>회원정보수정</MenuButton>
                   <MenuButton onClick={onLogOut}>로그아웃</MenuButton>
                 </Menu>
               )}
