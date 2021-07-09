@@ -58,7 +58,7 @@ const Intro = () => {
   const { me } = useSelector((state) => state.user);
   const router = useRouter();
 
-  const goToRouter = (name) => router.push(`/UpdateUserInfo/?component=${name}`);
+  const goToRouter = (name) => router.push(`/UpdateUserInfo?component=${name}`);
 
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column', backgroundColor: '#1d2327' }}>

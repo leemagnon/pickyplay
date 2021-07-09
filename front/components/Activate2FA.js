@@ -21,6 +21,16 @@ const Contents = styled.div`
   flex-direction: column;
   align-items: center;
   font-size: 23px;
+  & input {
+    border-bottom-color: blue;
+    border-top-style: none;
+    border-left-style: none;
+    border-right-style: none;
+  }
+  & span {
+    font-size: 20px;
+    color: blue
+  }
 `;
 
 const Buttons = styled.div`
@@ -36,7 +46,7 @@ const Buttons = styled.div`
 
 const Activate2FA = () => {
   const dispatch = useDispatch();
-  const { me, secondAuthError } = useSelector((state) => state.user);
+  const { me, secondAuthDone, secondAuthError } = useSelector((state) => state.user);
   const [QRCodeUrl, setQRCodeUrl] = useState('');
   const [otp, setOTP] = useState('');
   const router = useRouter();
@@ -56,6 +66,13 @@ const Activate2FA = () => {
       fetchData();
     }
   }, [me && me.id]);
+
+  useEffect(() => {
+    if (secondAuthDone) {
+      alert('2단계 인증 활성화 완료.');
+      router.replace('/');
+    }
+  }, [secondAuthDone]);
 
   useEffect(() => { // OTP 틀림.
     if (secondAuthError) {
@@ -80,7 +97,6 @@ const Activate2FA = () => {
   }, [otp]);
 
   const onSubmit = useCallback(() => {
-    document.getElementById('otpForm').submit();
     dispatch({
       type: SECOND_AUTH_REQUEST,
       data: {
@@ -95,9 +111,10 @@ const Activate2FA = () => {
     router.query.page === '2' ? (
       <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column' }}>
         <Title>OTP 설정</Title>
-        <Contents>
+        <Contents style={{ textAlign: 'center' }}>
           앱에 표시된 6자리 코드를 입력하세요.
-          코드 입력
+          <br /><br />
+          <span>코드 입력</span>
           <form id="otpForm" onSubmit="return false">
             <input type="text" value={otp} onChange={onChangeOTP} />
           </form>

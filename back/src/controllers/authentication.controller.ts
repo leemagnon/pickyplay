@@ -93,15 +93,16 @@ class AuthenticationController implements Controller {
     }
   };
 
-  private secondFactorAuthentication = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  private secondFactorAuthentication = async (req: Request, res: Response, next: NextFunction) => {
     const secondAuthData: SecondAuthDto = req.body;
     const { isCodeValid, user } = await this.authenticationService.verifyTwoFactorAuthenticationCode(secondAuthData);
+    console.log('isCodeValid : ', isCodeValid);
     if (isCodeValid) {
       if (secondAuthData.isActivate2FAPage) {
-        await this.userService.enable2FA(req.user);
+        await this.userService.enable2FA(user.id);
       }
       if (secondAuthData.isDeactivate2FAPage) {
-        await this.userService.disable2FA(req.user);
+        await this.userService.disable2FA(user.id);
       }
       const tokenData = this.authenticationService.createToken(user);
       user.password = undefined;

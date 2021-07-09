@@ -8,6 +8,7 @@ import axios from 'axios';
 import { SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
 import wrapper from '../../store/configureStore';
 import AppContext from '../../contexts/appContext';
+import { emailRule, nicknameRule, passwordRule } from '../../util/regexp';
 
 /** css */
 const Background = styled.div`
@@ -70,11 +71,8 @@ const InputError = styled.div`
 const Signup = () => {
   const dispatch = useDispatch();
   const browserWidth = useContext(AppContext);
-  console.log('browserWidth : ', browserWidth);
   const {
     getEmailAuthCodeLoading,
-    checkDuplicatedNicknameLoading,
-    checkDuplicatedNicknameError,
     signUpLoading,
     signUpDone,
     signUpError,
@@ -95,6 +93,7 @@ const Signup = () => {
     setDuplicatedNicknameCheckRequiredError,
   ] = useState(false);
   const [nicknamePassMsg, setNicknamePassMsg] = useState('');
+  const [nicknameFailMsg, setNicknameFailMsg] = useState('');
   const [password, setPassword] = useState('');
   const [passwordRequiredError, setPasswordRequiredError] = useState(false);
   const [passwordLengthError, setPasswordLengthError] = useState(false);
@@ -102,14 +101,10 @@ const Signup = () => {
   const [passwordCheckRequiredError, setPasswordCheckRequiredError] = useState(false);
   const [passwordCheckError, setPasswordCheckError] = useState(false);
 
-  const emailRule = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
-  const nicknameRule = /^[\w\Wㄱ-ㅎㅏ-ㅣ가-힣]{2,10}$/;
-  const passwordRule = /^.*(?=^.{8,20}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
-
   // 클래스 명
   const EmailInput = emailRequiredError || emailValidationError ? 'error' : null;
   const UserEmailAuthCodeInput = userEmailAuthCodeRequiredError || userEmailAuthCodeValidationError ? 'error' : null;
-  const NicknameInput = nicknameRequiredError || nicknameValidationError || duplicatedNicknameCheckRequiredError ? 'error' : null;
+  const NicknameInput = nicknameRequiredError || nicknameValidationError || duplicatedNicknameCheckRequiredError || nicknameFailMsg !== '' ? 'error' : null;
   const PasswordCheckInput = passwordCheckRequiredError || passwordCheckError ? 'error' : null;
   const PasswordInput = passwordRequiredError || passwordLengthError ? 'error' : null;
 
@@ -132,10 +127,10 @@ const Signup = () => {
   }, [signUpError]);
 
   useEffect(() => {
-    if (checkDuplicatedNicknameError) { // 닉네임 중복 등의 에러 발생 시 alert 띄우기
-      alert(checkDuplicatedNicknameError.message);
+    if (nicknameFailMsg !== '') { // 닉네임 중복 등의 에러 발생 시 alert 띄우기
+      alert(nicknameFailMsg);
     }
-  }, [checkDuplicatedNicknameError]);
+  }, [nicknameFailMsg]);
 
   useEffect(() => {
     if (nicknamePassMsg !== '') { // 닉네임 중복 검사 통과 메시지
@@ -152,17 +147,17 @@ const Signup = () => {
         setEmailValidationError(false);
         return 0;
       }
-      if (emailValidationError) {
+      if (emailRequiredError || emailValidationError) {
         return 0;
       }
 
       const result = await axios.post('/auth/emailAuthCode', {
         email,
       });
-
       setEmailAuthCode(result.data);
+      alert(`${email}로 인증코드가 전송되었습니다.`);
     },
-    [email, emailValidationError],
+    [email, emailRequiredError, emailValidationError],
   );
 
   const checkDuplicatedNickname = useCallback(
@@ -182,11 +177,13 @@ const Signup = () => {
         return 0;
       }
 
-      const result = await axios.post('/auth/nickname', {
+      axios.post('/auth/nickname', {
         nickname,
+      }).then((result) => {
+        setNicknamePassMsg(result.data);
+      }).catch((error) => {
+        setNicknameFailMsg(error.response.data.message);
       });
-
-      setNicknamePassMsg(result.data);
     }, [nickname, nicknameValidationError],
   );
 
@@ -213,6 +210,7 @@ const Signup = () => {
 
   const onChangeNickname = useCallback((e) => {
     setNicknamePassMsg('');
+    setNicknameFailMsg('');
     setNickname(e.target.value);
 
     if (e.target.value !== '') {
@@ -373,11 +371,11 @@ const Signup = () => {
             {nicknameRequiredError && <InputError>닉네임을 입력해야 합니다.</InputError>}
             {nicknameValidationError && <InputError>닉네임은 2자~10자 사이여야 합니다.</InputError>}
             {nicknamePassMsg !== '' && <div style={{ color: '#52c41a', marginBottom: '32px' }}>{nicknamePassMsg}</div>}
+            {nicknameFailMsg !== '' && <InputError>{nicknameFailMsg}</InputError>}
             {duplicatedNicknameCheckRequiredError && <InputError>닉네임 중복 여부를 확인해야 합니다.</InputError>}
             <Button
               type="primary"
               onClick={checkDuplicatedNickname}
-              loading={checkDuplicatedNicknameLoading}
               style={{
                 backgroundColor: '#690096',
                 borderColor: '#690096',

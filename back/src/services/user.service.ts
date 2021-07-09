@@ -2,6 +2,8 @@ import userModel from 'src/models/user.model';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import User from 'src/interfaces/user.interface';
+import UserWithThatEmailAlreadyExistsException from 'src/exceptions/UserWithThatEmailAlreadyExistsException';
+import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 
 class UserService {
   public user = userModel;
@@ -31,22 +33,48 @@ class UserService {
     };
   }
 
-  public enable2FA(user: User) {
-    this.user.update(
+  public async enable2FA(id: string) {
+    await this.user.update(
       {
         is2FAOn: true,
       },
-      { where: { id: user.id } },
+      { where: { id } },
     );
   }
 
-  public disable2FA(user: User) {
-    this.user.update(
+  public async disable2FA(id: string) {
+    await this.user.update(
       {
         twoFactorAuthenticationCode: null,
         is2FAOn: false,
       },
-      { where: { id: user.id } },
+      { where: { id } },
+    );
+  }
+
+  public async updateUserEmail(req: RequestWithUser) {
+    const newEmail: string = req.body.email;
+    const exUser = await this.user.findOne({ where: { email: newEmail } });
+    if (!exUser) {
+      await this.user.update(
+        {
+          email: newEmail,
+        },
+        { where: { id: req.user.id } },
+      );
+    } else {
+      throw new UserWithThatEmailAlreadyExistsException(newEmail);
+    }
+  }
+
+  public async updateUserPassword(req: RequestWithUser) {
+    const newPassword: string = req.body.password;
+
+    await this.user.update(
+      {
+        password: newPassword,
+      },
+      { where: { id: req.user.id }, individualHooks: true },
     );
   }
 }

@@ -1,9 +1,6 @@
 import { all, fork, takeLatest, put, call } from '@redux-saga/core/effects';
 import axios from 'axios';
 import {
-  GET_EMAIL_AUTH_CODE_REQUEST,
-  GET_EMAIL_AUTH_CODE_SUCCESS,
-  GET_EMAIL_AUTH_CODE_FAILURE,
   LOG_IN_REQUEST,
   LOG_IN_SUCCESS,
   LOG_IN_FAILURE,
@@ -22,6 +19,12 @@ import {
   UPLOAD_PROFILE_IMAGE_REQUEST,
   UPLOAD_PROFILE_IMAGE_SUCCESS,
   UPLOAD_PROFILE_IMAGE_FAILURE,
+  UPDATE_USER_EMAIL_REQUEST,
+  UPDATE_USER_EMAIL_SUCCESS,
+  UPDATE_USER_EMAIL_FAILURE,
+  UPDATE_USER_PASSWORD_REQUEST,
+  UPDATE_USER_PASSWORD_SUCCESS,
+  UPDATE_USER_PASSWORD_FAILURE,
 } from '../reducers/user';
 
 function logOutAPI() {
@@ -37,27 +40,6 @@ function* logOut() {
   } catch (err) {
     yield put({
       type: LOG_OUT_FAILURE,
-      error: err.response.data,
-    });
-  }
-}
-
-function getEmailAuthCodeAPI(data) {
-  return axios.post('/auth/emailAuthCode', {
-    email: data,
-  });
-}
-
-function* getEmailAuthCode(action) {
-  try {
-    const result = yield call(getEmailAuthCodeAPI, action.data);
-    yield put({
-      type: GET_EMAIL_AUTH_CODE_SUCCESS,
-      data: result.data,
-    });
-  } catch (err) {
-    yield put({
-      type: GET_EMAIL_AUTH_CODE_FAILURE,
       error: err.response.data,
     });
   }
@@ -142,11 +124,12 @@ function* signUp(action) {
 }
 
 function uploadProfileImageAPI(data) {
-  return axios.post('/auth/upload', data);
+  return axios.post('/user/newProfile', data);
 }
 
 function* uploadProfileImage(action) {
   try {
+    console.log(action.data);
     const result = yield call(uploadProfileImageAPI, action.data);
     yield put({
       type: UPLOAD_PROFILE_IMAGE_SUCCESS,
@@ -160,12 +143,47 @@ function* uploadProfileImage(action) {
   }
 }
 
+function updateUserEmailAPI(data) {
+  return axios.post('/user/newEmail', data);
+}
+
+function* updateUserEmail(action) {
+  try {
+    const result = yield call(updateUserEmailAPI, action.data);
+    yield put({
+      type: UPDATE_USER_EMAIL_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: UPDATE_USER_EMAIL_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function updateUserPasswordAPI(data) {
+  return axios.post('/user/newPassword', data);
+}
+
+function* updateUserPassword(action) {
+  try {
+    const result = yield call(updateUserPasswordAPI, action.data);
+    yield put({
+      type: UPDATE_USER_PASSWORD_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: UPDATE_USER_PASSWORD_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 // 이벤트 리스너 역할
 function* watchLogOut() {
   yield takeLatest(LOG_OUT_REQUEST, logOut);
-}
-function* watchGetEmailAuthCode() {
-  yield takeLatest(GET_EMAIL_AUTH_CODE_REQUEST, getEmailAuthCode);
 }
 function* watchLogIn() {
   yield takeLatest(LOG_IN_REQUEST, logIn);
@@ -182,15 +200,22 @@ function* watchSignUp() {
 function* watchUploadProfileImage() {
   yield takeLatest(UPLOAD_PROFILE_IMAGE_REQUEST, uploadProfileImage);
 }
+function* watchUpdateUserEmail() {
+  yield takeLatest(UPDATE_USER_EMAIL_REQUEST, updateUserEmail);
+}
+function* watchUpdateUserPassword() {
+  yield takeLatest(UPDATE_USER_PASSWORD_REQUEST, updateUserPassword);
+}
 
 export default function* userSaga() {
   yield all([
     fork(watchLogOut),
-    fork(watchGetEmailAuthCode),
     fork(watchLogIn),
     fork(watchSecondAuth),
     fork(watchLoadMyInfo),
     fork(watchSignUp),
     fork(watchUploadProfileImage),
+    fork(watchUpdateUserEmail),
+    fork(watchUpdateUserPassword),
   ]);
 }

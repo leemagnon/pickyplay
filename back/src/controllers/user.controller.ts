@@ -14,9 +14,11 @@ class UserController implements Controller {
   private upload = multer({
     storage: multer.diskStorage({
       destination(req, file, done) {
+        console.log(file);
         done(null, 'uploads');
       },
       filename(req, file, done) {
+        console.log(file);
         // 쥐돌이.png
         const ext = path.extname(file.originalname); // 확장자 추출(.png)
         const basename = path.basename(file.originalname, ext); // 쥐돌이
@@ -35,7 +37,7 @@ class UserController implements Controller {
     this.router.get(`${this.path}/QRCodeUrl`, authMiddleware, this.getQRCodeUrl);
     this.router.post(`${this.path}/newEmail`, authMiddleware, this.updateEmail);
     this.router.post(`${this.path}/newPassword`, authMiddleware, this.updatePassword);
-    this.router.post(`${this.path}/newProfile`, authMiddleware, this.upload.single('profileImg'), this.updateProfile);
+    this.router.post(`${this.path}/newProfile`, authMiddleware, this.upload.single('image'), this.updateProfile);
     this.router.patch(`${this.path}/Disable2FA`, authMiddleware, this.disable2FA);
   }
 
@@ -49,18 +51,30 @@ class UserController implements Controller {
     }
   };
 
-  private updateEmail = (req: Request, res: Response, next: NextFunction) => {
+  private disable2FA = (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body);
+      this.userService.disable2FA(req.user.id);
+      res.status(200).send('ok');
     } catch (error) {
       console.error(error);
       next(error);
     }
   };
 
-  private updatePassword = (req: Request, res: Response, next: NextFunction) => {
+  private updateEmail = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body);
+      await this.userService.updateUserEmail(req);
+      res.status(200).send('ok');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private updatePassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      await this.userService.updateUserPassword(req);
+      res.status(200).send('ok');
     } catch (error) {
       console.error(error);
       next(error);
@@ -70,19 +84,10 @@ class UserController implements Controller {
   private updateProfile = (req: Request, res: Response, next: NextFunction) => {
     try {
       fs.accessSync('uploads');
-      console.log(req.files);
+      res.json(req.file);
+      console.log(req.file);
     } catch (error) {
       fs.mkdirSync('uploads'); // 업로드 폴더가 없으므로 생성
-      console.error(error);
-      next(error);
-    }
-  };
-
-  private disable2FA = (req: RequestWithUser, res: Response, next: NextFunction) => {
-    try {
-      this.userService.disable2FA(req.user);
-      res.status(200).send('ok');
-    } catch (error) {
       console.error(error);
       next(error);
     }

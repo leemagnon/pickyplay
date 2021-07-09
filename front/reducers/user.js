@@ -2,9 +2,6 @@ import produce from 'immer';
 
 export const initialState = {
   emailAuthCode: '',
-  getEmailAuthCodeLoading: false, // 이메일 인증 번호 받아오기 시도중
-  getEmailAuthCodeDone: false,
-  getEmailAuthCodeError: null,
   secondAuthLoading: false, // 2FA 시도중
   secondAuthDone: false,
   secondAuthError: null,
@@ -24,13 +21,15 @@ export const initialState = {
   uploadProfileImgLoading: false, // 프로필 이미지 업로드 시도중
   uploadProfileImgDone: false,
   uploadProfileImgError: null,
+  updateUserEmailLoading: false, // 사용자 이메일 변경 시도중
+  updateUserEmailDone: false,
+  updateUserEmailError: null,
+  updateUserPasswordLoading: false, // 사용자 비밀번호 변경 시도중
+  updateUserPasswordDone: false,
+  updateUserPasswordError: null,
   profileImgPath: '',
   me: null,
 };
-
-export const GET_EMAIL_AUTH_CODE_REQUEST = 'GET_EMAIL_AUTH_CODE_REQUEST';
-export const GET_EMAIL_AUTH_CODE_SUCCESS = 'GET_EMAIL_AUTH_CODE_SUCCESS';
-export const GET_EMAIL_AUTH_CODE_FAILURE = 'GET_EMAIL_AUTH_CODE_FAILURE';
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
@@ -56,23 +55,20 @@ export const UPLOAD_PROFILE_IMAGE_REQUEST = 'UPLOAD_PROFILE_IMAGE_REQUEST';
 export const UPLOAD_PROFILE_IMAGE_SUCCESS = 'UPLOAD_PROFILE_IMAGE_SUCCESS';
 export const UPLOAD_PROFILE_IMAGE_FAILURE = 'UPLOAD_PROFILE_IMAGE_FAILURE';
 
+export const UPDATE_USER_PROFILE_REQUEST = 'UPDATE_USER_PROFILE_REQUEST';
+export const UPDATE_USER_PROFILE_SUCCESS = 'UPDATE_USER_PROFILE_SUCCESS';
+export const UPDATE_USER_PROFILE_FAILURE = 'UPDATE_USER_PROFILE_FAILURE';
+
+export const UPDATE_USER_EMAIL_REQUEST = 'UPDATE_USER_EMAIL_REQUEST';
+export const UPDATE_USER_EMAIL_SUCCESS = 'UPDATE_USER_EMAIL_SUCCESS';
+export const UPDATE_USER_EMAIL_FAILURE = 'UPDATE_USER_EMAIL_FAILURE';
+
+export const UPDATE_USER_PASSWORD_REQUEST = 'UPDATE_USER_PASSWORD_REQUEST';
+export const UPDATE_USER_PASSWORD_SUCCESS = 'UPDATE_USER_PASSWORD_SUCCESS';
+export const UPDATE_USER_PASSWORD_FAILURE = 'UPDATE_USER_PASSWORD_FAILURE';
+
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
-    case GET_EMAIL_AUTH_CODE_REQUEST:
-      draft.getEmailAuthCodeLoading = true;
-      draft.getEmailAuthCodeDone = false;
-      draft.getEmailAuthCodeError = null;
-      break;
-    case GET_EMAIL_AUTH_CODE_SUCCESS:
-      draft.getEmailAuthCodeLoading = false;
-      draft.getEmailAuthCodeDone = true;
-      draft.emailAuthCode = action.data;
-      break;
-    case GET_EMAIL_AUTH_CODE_FAILURE:
-      draft.getEmailAuthCodeLoading = false;
-      draft.getEmailAuthCodeDone = false;
-      draft.getEmailAuthCodeError = action.error;
-      break;
     case SECOND_AUTH_REQUEST:
       draft.secondAuthLoading = true;
       draft.secondAuthDone = false;
@@ -161,6 +157,32 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case UPLOAD_PROFILE_IMAGE_FAILURE:
       draft.uploadProfileImgLoading = false;
       draft.uploadProfileImgError = action.error;
+      break;
+    case UPDATE_USER_EMAIL_REQUEST:
+      draft.updateUserEmailLoading = true;
+      draft.updateUserEmailDone = false;
+      draft.updateUserEmailError = null;
+      break;
+    case UPDATE_USER_EMAIL_SUCCESS:
+      draft.updateUserEmailLoading = false;
+      draft.updateUserEmailDone = true;
+      break;
+    case UPDATE_USER_EMAIL_FAILURE:
+      draft.updateUserEmailLoading = false;
+      draft.updateUserEmailError = action.error;
+      break;
+    case UPDATE_USER_PASSWORD_REQUEST:
+      draft.updateUserPasswordLoading = true;
+      draft.updateUserPasswordDone = false;
+      draft.updateUserPasswordError = null;
+      break;
+    case UPDATE_USER_PASSWORD_SUCCESS:
+      draft.updateUserPasswordLoading = false;
+      draft.updateUserPasswordDone = true;
+      break;
+    case UPDATE_USER_PASSWORD_FAILURE:
+      draft.updateUserPasswordLoading = false;
+      draft.updateUserPasswordError = action.error;
       break;
     default:
       break;

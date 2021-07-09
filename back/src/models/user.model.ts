@@ -45,6 +45,7 @@ export default class User extends Model {
   @BeforeUpdate
   @BeforeCreate
   static async encryptPassword(instance: User) {
+    console.log('왜 실행 안 됨?');
     instance.password = await bcrypt.hash(instance.password, 10);
   }
 }
