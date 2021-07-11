@@ -184,7 +184,7 @@ const AppLayout = ({ children }) => {
   }, []);
 
   return (
-    <div style={{ backgroundColor: 'black' }}>
+    <div style={{ width: '100%', height: '100%', overflow: 'hidden', overflowY: 'scroll', backgroundColor: 'black' }}>
       <Global />
       <Wrapper1>
         <Header>

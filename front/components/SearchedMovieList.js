@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -91,14 +91,14 @@ const SearchedMovieList = ({ searchedMovies }) => {
 
         return (
           <div style={{ position: 'relative' }}>
+
             <PosterCard
               key={v._source.DOCID._cdata}
-              onMouseEnter={() => toggleSimpleInfo(v._source.DOCID._cdata, true)}
-              onMouseLeave={() => toggleSimpleInfo(v._source.DOCID._cdata)}
               src={v._source.posters._cdata}
               onError={(e) => { e.target.style.backgroundcolor = 'dodgerblue'; }}
               alt={v._source.title._cdata.trim()}
             />
+
             <SimpleInfo
               key={v._id}
               id={v._source.DOCID._cdata}
@@ -107,6 +107,18 @@ const SearchedMovieList = ({ searchedMovies }) => {
               <div>{v._source.genre._cdata}</div>
               <div>{actorStr}</div>
             </SimpleInfo>
+
+            <div
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+              }}
+              onMouseOverCapture={() => toggleSimpleInfo(v._source.DOCID._cdata, true)}
+              onMouseOutCapture={() => toggleSimpleInfo(v._source.DOCID._cdata)}
+            />
           </div>
         );
       })}
