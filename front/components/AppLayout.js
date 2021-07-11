@@ -124,6 +124,31 @@ const MenuButton = styled.button`
   cursor: pointer;
 `;
 
+/* drawer 열림 */
+const openedStyle = {
+  maxWidth: '100%' /* max-with is 100% when the drawer is opened */,
+  opacity: 1,
+  transition: 'max-width 0.5s, opacity 0.2s'
+};
+
+/* drawer 닫힘 */
+const closedStyle = {
+  maxWidth: 0 /* max-width is 0 in the closed drawer */,
+  opacity: 0,
+  transition: 'max-width 0.5s, opacity 0.2s'
+};
+
+const settings = { // slider 세팅
+  dots: false,
+  arrows: false,
+  infinite: true,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,
+  speed: 500,
+  autoplaySpeed: 2000,
+};
+
 const AppLayout = ({ children }) => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -133,16 +158,7 @@ const AppLayout = ({ children }) => {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const settings = { // slider 세팅
-    dots: false,
-    arrows: false,
-    infinite: true,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    speed: 500,
-    autoplaySpeed: 2000,
-  };
+  const [opened, setOpened] = useState(false);
 
   const onChangeText = useCallback((e) => {
     if (e.target.value !== '') {
@@ -183,6 +199,10 @@ const AppLayout = ({ children }) => {
     dispatch({ type: LOG_OUT_REQUEST });
   }, []);
 
+  const toggleOpened = useCallback(() => {
+    setOpened(prev => !prev);
+  })
+
   return (
     <div style={{ width: '100%', height: '100%', overflow: 'hidden', overflowY: 'scroll', backgroundColor: 'black' }}>
       <Global />
@@ -198,22 +218,24 @@ const AppLayout = ({ children }) => {
           </Link>
 
           <div className="search_box">
-            <Input
-              type="text"
-              onChange={onChangeText}
-              maxLength="100"
-              placeholder="제목, 키워드, 장르, 사람"
-            />
-            <button
+          <button
               type="submit"
               className="font-nanum-gothic"
               style={{ height: 34 }}
+              onClick={toggleOpened}
             >
               <img
                 src="/free-icon-magnifying-glass-search-13311.png"
                 alt="magnifying-glass-search"
               />
             </button>
+            <Input
+              type="text"
+              onChange={onChangeText}
+              maxLength="100"
+              placeholder="제목, 키워드, 장르, 사람"
+              style={opened ? openedStyle : closedStyle}
+            />
           </div>
 
           {me ? (

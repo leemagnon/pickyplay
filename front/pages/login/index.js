@@ -12,6 +12,8 @@ import AppContext from '../../contexts/appContext';
 
 /** css */
 const Background = styled.div`
+  display: flex;
+  overflow: hidden;
   position: relative;
   background-image: url('/login_bg.jpg');
   background-size: cover;
@@ -275,8 +277,8 @@ const LogIn = () => {
       <Modal setShowQRCodeModal={setShowQRCodeModal} email={email} />
       )}
       <Footer className="font-nanum-gothic">
-        <div style={{ minWidth: '929px' }}>
-          <div style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+        <div>
+          <div style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '60px' }}>
             <small>
               만든 이: leemagnon
               <br />
@@ -303,7 +305,6 @@ const LogIn = () => {
             style={{
               display: 'inline-block',
               verticalAlign: 'middle',
-              marginLeft: '60px',
             }}
           >
             <small>
