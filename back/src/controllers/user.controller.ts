@@ -1,32 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Controller from 'src/interfaces/controller.interface';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 import authMiddleware from 'src/middleware/auth.middleware';
 import UserService from 'src/services/user.service';
+import { S3Upload, uploadProfileImg } from 'src/utils/imageUpload';
 
 class UserController implements Controller {
   public path = '/user';
   public router = express.Router();
   private userService = new UserService();
-  private upload = multer({
-    storage: multer.diskStorage({
-      destination(req, file, done) {
-        console.log(file);
-        done(null, 'uploads');
-      },
-      filename(req, file, done) {
-        console.log(file);
-        // 쥐돌이.png
-        const ext = path.extname(file.originalname); // 확장자 추출(.png)
-        const basename = path.basename(file.originalname, ext); // 쥐돌이
-        done(null, basename + '_' + new Date().getTime() + ext);
-      },
-    }),
-    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
-  });
+  private upload = S3Upload('profile');
 
   constructor() {
     this.initializeRoutes();
@@ -37,7 +20,7 @@ class UserController implements Controller {
     this.router.get(`${this.path}/QRCodeUrl`, authMiddleware, this.getQRCodeUrl);
     this.router.post(`${this.path}/newEmail`, authMiddleware, this.updateEmail);
     this.router.post(`${this.path}/newPassword`, authMiddleware, this.updatePassword);
-    this.router.post(`${this.path}/newProfile`, authMiddleware, this.upload.single('image'), this.updateProfile);
+    this.router.post(`${this.path}/newProfile`, authMiddleware, this.upload.single('image'), uploadProfileImg);
     this.router.patch(`${this.path}/Disable2FA`, authMiddleware, this.disable2FA);
   }
 
@@ -76,18 +59,6 @@ class UserController implements Controller {
       await this.userService.updateUserPassword(req);
       res.status(200).send('ok');
     } catch (error) {
-      console.error(error);
-      next(error);
-    }
-  };
-
-  private updateProfile = (req: Request, res: Response, next: NextFunction) => {
-    try {
-      fs.accessSync('uploads');
-      res.json(req.file);
-      console.log(req.file);
-    } catch (error) {
-      fs.mkdirSync('uploads'); // 업로드 폴더가 없으므로 생성
       console.error(error);
       next(error);
     }

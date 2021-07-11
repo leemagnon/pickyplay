@@ -60,9 +60,11 @@ const InputError = styled.div`
 const UpdateProfile = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { me } = useSelector((state) => state.user);
+  const { me,
+    profileImgPath,
+    uploadProfileImgError,
+    uploadProfileImgDone } = useSelector((state) => state.user);
   const imageInput = useRef();
-  const [profileImg, setProfileImg] = useState('');
   const [nickname, setNickname] = useState(me.nickname);
   const [nicknameValidationError, setNicknameValidationError] = useState(false);
   const [
@@ -79,6 +81,18 @@ const UpdateProfile = () => {
       router.replace('/');
     }
   }, [me]);
+
+  useEffect(() => {
+    if (uploadProfileImgError) {
+      alert(uploadProfileImgError.message);
+    }
+  }, [uploadProfileImgError]);
+
+  useEffect(() => {
+    if (uploadProfileImgDone) {
+      alert('이미지 업로드 완료.');
+    }
+  }, [uploadProfileImgDone]);
 
   useEffect(() => {
     if (nicknameFailMsg !== '') { // 닉네임 중복 등의 에러 발생 시 alert 띄우기
@@ -136,19 +150,12 @@ const UpdateProfile = () => {
   }, [imageInput.current]);
 
   const onChangeImages = useCallback((e) => {
-    // console.log(e.target.files[0]);
-    // setProfileImg(e.target.files[0]);
     const imageFormData = new FormData();
     imageFormData.append('image', e.target.files[0]);
-    // console.log(imageFormData);
     dispatch({
       type: UPLOAD_PROFILE_IMAGE_REQUEST,
       data: imageFormData,
     });
-  }, []);
-
-  const goBack = useCallback(() => {
-    router.back();
   }, []);
 
   const onSubmit = useCallback(() => {
@@ -164,21 +171,25 @@ const UpdateProfile = () => {
       }
     }
 
-    console.log(nickname, profileImg);
+    console.log(nickname, profileImgPath);
 
     dispatch({
       type: UPDATE_USER_PROFILE_REQUEST,
-      data: { nickname, profileImg },
+      data: { nickname, profileImgPath },
     });
   }, [nickname, nicknamePassMsg, duplicatedNicknameCheckRequiredError,
-    profileImg,
+    profileImgPath,
   ]);
+
+  const goBack = useCallback(() => {
+    router.back();
+  }, []);
 
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column' }}>
       <Title>프로필 변경</Title>
       <Contents style={{ textAlign: 'center' }}>
-        <ProfileImg src={me.profileImgPath ? me.profileImgPath : gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} onClick={onClickImageUpload} />
+        <ProfileImg src={profileImgPath || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} onClick={onClickImageUpload} />
         <br /><br />
         <form id="nicknameForm" encType="multipart/form-data" onSubmit="return false">
           <input type="file" name="image" hidden ref={imageInput} onChange={onChangeImages} />
