@@ -12,9 +12,8 @@ import AppContext from '../../contexts/appContext';
 
 /** css */
 const Background = styled.div`
-  display: flex;
   overflow: hidden;
-  position: relative;
+  overflow-y: scroll;
   background-image: url('/login_bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
@@ -23,18 +22,13 @@ const Background = styled.div`
 `;
 
 const Header = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
   width: 100%;
   height: 14%;
   border-bottom: transparent;
+  margin-left: 20px;
 `;
 
 const Logo = styled.h1`
-  position: absolute;
-  top: -20px;
-  left: 27px;
   color: white;
   font-size: 45px;
   & span {
@@ -43,15 +37,10 @@ const Logo = styled.h1`
 `;
 
 const LogInBody = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 55;
-  left: 0;
   margin: auto;
-  width: 460px;
-  height: 500px;
-  padding: 30px 65px;
+  margin-bottom: 50px;
+  width: ${({ browserWidth }) => (browserWidth >= 510 ? 460 : browserWidth - 20)}px;
+  padding: 30px ${({ browserWidth }) => (browserWidth >= 510 ? 65 : 30)}px;
   background-color: rgba(0, 0, 0, 0.75);
 `;
 
@@ -127,9 +116,6 @@ const SignUp = styled.div`
 `;
 
 const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
   padding: 20px 40px;
   background-color: rgba(0, 0, 0, 0.75);
   color: #737373;
@@ -144,7 +130,6 @@ const aTagStyle = {
 /* 로그인 컴포넌트 */
 const LogIn = () => {
   const browserWidth = useContext(AppContext);
-  console.log('browserWidth : ', browserWidth);
 
   const dispatch = useDispatch();
   const {
@@ -231,7 +216,7 @@ const LogIn = () => {
           LAY
         </Logo>
       </Header>
-      <LogInBody>
+      <LogInBody browserWidth={browserWidth}>
         <form onSubmit={onSubmit}>
           <LoginText className="font-nanum-gothic">로그인</LoginText>
 
