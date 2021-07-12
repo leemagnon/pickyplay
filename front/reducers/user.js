@@ -39,6 +39,8 @@ export const SECOND_AUTH_REQUEST = 'SECOND_AUTH_REQUEST';
 export const SECOND_AUTH_SUCCESS = 'SECOND_AUTH_SUCCESS';
 export const SECOND_AUTH_FAILURE = 'SECOND_AUTH_FAILURE';
 
+export const CLOSE_OTP_FORM_REQUEST = 'CLOSE_OTP_FORM_REQUEST';
+
 export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
 export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
@@ -116,6 +118,9 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.logInLoading = false;
       draft.logInDone = false;
       draft.logInError = action.error;
+      break;
+    case CLOSE_OTP_FORM_REQUEST:
+      draft.activate2FA = false;
       break;
     case LOG_OUT_REQUEST:
       draft.logOutLoading = true;

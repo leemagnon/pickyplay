@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import DetailedMovieModal from './DetailedMovieModal';
 
 const PosterCards = styled.div`
     margin: 0 auto;
@@ -48,19 +49,36 @@ const PosterCard = styled.img`
 `;
 
 const SimpleInfo = styled.div`
+    display: none;
+    background-color: rgb(0,0,0,0.7);
     position: absolute;
     float: left;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    width: 200px;
-    height: 200px;
-    background-color: pink;
-   
-    display: none;
+    width: 400px;
+    color: white;
+    padding: 1rem;
+    border: 5px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
+    & div {
+      margin-bottom: 10px;
+    }
+    & b {
+      font-size: 15px;
+    }
+    & button {
+      &:hover {
+        background-color: red;
+      }
+    }
 `;
 
 const SearchedMovieList = ({ searchedMovies }) => {
+  const [showMovieDetail, setShowMovieDetail] = useState(false);
+  const docReference = useRef();
+
   const toggleSimpleInfo = useCallback((DOCID, show = false) => {
     if (show) {
       document.getElementById(DOCID).style.display = 'flex';
@@ -69,6 +87,12 @@ const SearchedMovieList = ({ searchedMovies }) => {
       document.getElementById(DOCID).style.display = 'none';
     }
   }, []);
+
+  const toggleMovieDetail = useCallback(() => {
+    console.log('실행됨');
+    console.log(docReference.current);
+    // setShowMovieDetail((prev) => !prev);
+  }, [docReference]);
 
   return (
     <PosterCards>
@@ -102,19 +126,23 @@ const SearchedMovieList = ({ searchedMovies }) => {
             <SimpleInfo
               key={v._id}
               id={v._source.DOCID._cdata}
+              ref={docReference}
             >
-              <div>{v._source.keywords._cdata}</div>
-              <div>{v._source.genre._cdata}</div>
-              <div>{actorStr}</div>
+              <div><b>키워드 :</b> {v._source.keywords._cdata}</div>
+              <div><b>장르 :</b> {v._source.genre._cdata}</div>
+              <div><b>배우 :</b> {actorStr}</div>
+              <button type="button" onClick={toggleMovieDetail} style={{ zIndex: 4 }}>상세보기</button>
             </SimpleInfo>
 
             <div
               style={{
+                zIndex: 2,
                 position: 'absolute',
                 top: '0',
                 left: '0',
                 width: '100%',
                 height: '100%',
+                backgroundColor: 'red',
               }}
               onMouseOverCapture={() => toggleSimpleInfo(v._source.DOCID._cdata, true)}
               onMouseOutCapture={() => toggleSimpleInfo(v._source.DOCID._cdata)}
@@ -122,6 +150,7 @@ const SearchedMovieList = ({ searchedMovies }) => {
           </div>
         );
       })}
+      {showMovieDetail && <DetailedMovieModal toggleMovieDetail={toggleMovieDetail} />}
     </PosterCards>
 
   );

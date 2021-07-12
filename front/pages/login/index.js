@@ -9,6 +9,7 @@ import { LOG_IN_REQUEST, LOAD_MY_INFO_REQUEST } from '../../reducers/user';
 import Modal from '../../components/Modal';
 import wrapper from '../../store/configureStore';
 import AppContext from '../../contexts/appContext';
+import OTPForm from '../../components/OTPForm';
 
 /** css */
 const Background = styled.div`
@@ -130,7 +131,6 @@ const aTagStyle = {
 /* 로그인 컴포넌트 */
 const LogIn = () => {
   const browserWidth = useContext(AppContext);
-
   const dispatch = useDispatch();
   const {
     logInError,
@@ -142,7 +142,7 @@ const LogIn = () => {
   const [emailRequiredError, setEmailRequiredError] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordRequiredError, setPasswordRequiredError] = useState(false);
-  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
+  const [showOTPFormModal, setShowOTPFormModal] = useState(false);
 
   const EmailInput = emailRequiredError ? 'error' : null;
   const PasswordInput = passwordRequiredError ? 'error' : null;
@@ -167,9 +167,9 @@ const LogIn = () => {
 
   useEffect(() => {
     if (activate2FA) {
-      setShowQRCodeModal(true);
+      setShowOTPFormModal(true);
     }
-  }, [activate2FA]);
+  }, [activate2FA, showOTPFormModal]);
 
   const onChangeEmail = useCallback((e) => {
     setEmail(e.target.value);
@@ -258,8 +258,8 @@ const LogIn = () => {
           </Link>
         </SignUp>
       </LogInBody>
-      {showQRCodeModal && (
-      <Modal setShowQRCodeModal={setShowQRCodeModal} email={email} />
+      {showOTPFormModal && (
+      <Modal><OTPForm email={email} onCloseModal={setShowOTPFormModal} /></Modal>
       )}
       <Footer className="font-nanum-gothic">
         <div>
