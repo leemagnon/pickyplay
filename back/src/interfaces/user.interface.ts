@@ -1,5 +1,5 @@
 interface User {
-  id?: string;
+  userIdx?: number;
   email: string;
   password: string;
   twoFactorAuthenticationCode: string;

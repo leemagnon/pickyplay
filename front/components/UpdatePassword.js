@@ -61,8 +61,8 @@ const InputError = styled.div`
 const UpdatePassword = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const browserWidth = useContext(AppContext);
-  const { me,
+  const browserSize = useContext(AppContext);
+  const {
     updateUserPasswordLoading,
     updateUserPasswordDone,
     updateUserPasswordError } = useSelector((state) => state.user);
@@ -147,7 +147,7 @@ const UpdatePassword = () => {
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column' }}>
       <Title>비밀번호 변경</Title>
       <Contents>
-        <UpdatePasswordForm browserWidth={browserWidth} onFinish={onSubmit}>
+        <UpdatePasswordForm browserWidth={browserSize.browserWidth} onFinish={onSubmit}>
           <div>
             <label htmlFor="password">새 비밀번호</label>
             <br />

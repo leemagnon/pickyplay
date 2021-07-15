@@ -49,6 +49,7 @@ const CloseModalButton = styled.button`
   background: transparent;
   border: none;
   font-size: 30px;
+  font-weight: bold;
   cursor: pointer;
 `;
 
@@ -61,7 +62,7 @@ const OTPForm = ({ email, onCloseModal }) => {
   }, [twoFactorAuthenticationCode]);
 
   const onCloseOTPForm = useCallback(() => {
-    onCloseModal(false);
+    onCloseModal();
     dispatch({
       type: CLOSE_OTP_FORM_REQUEST,
     });
@@ -79,7 +80,7 @@ const OTPForm = ({ email, onCloseModal }) => {
   }, [twoFactorAuthenticationCode, email]);
 
   return (
-    <div style={{ textAlign: 'center' }}>
+    <div style={{ textAlign: 'center', padding: '30px 40px' }}>
       <CloseModalButton onClick={onCloseOTPForm}>&times;</CloseModalButton>
       <form onSubmit={onSubmit}>
         <div>
@@ -101,7 +102,7 @@ const OTPForm = ({ email, onCloseModal }) => {
 
 OTPForm.propTypes = {
   email: PropTypes.string.isRequired,
-  onCloseModal: PropTypes.bool.isRequired,
+  onCloseModal: PropTypes.func.isRequired,
 };
 
 export default OTPForm;

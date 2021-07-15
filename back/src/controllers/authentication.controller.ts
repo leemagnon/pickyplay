@@ -96,13 +96,12 @@ class AuthenticationController implements Controller {
   private secondFactorAuthentication = async (req: Request, res: Response, next: NextFunction) => {
     const secondAuthData: SecondAuthDto = req.body;
     const { isCodeValid, user } = await this.authenticationService.verifyTwoFactorAuthenticationCode(secondAuthData);
-    console.log('isCodeValid : ', isCodeValid);
     if (isCodeValid) {
       if (secondAuthData.isActivate2FAPage) {
-        await this.userService.enable2FA(user.id);
+        await this.userService.enable2FA(user.userIdx);
       }
       if (secondAuthData.isDeactivate2FAPage) {
-        await this.userService.disable2FA(user.id);
+        await this.userService.disable2FA(user.userIdx);
       }
       const tokenData = this.authenticationService.createToken(user);
       user.password = undefined;

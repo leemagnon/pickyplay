@@ -1,7 +1,13 @@
-import React, { useCallback, useState, useRef } from 'react';
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import ReactTooltip from 'react-tooltip';
 import DetailedMovieModal from './DetailedMovieModal';
+import Modal from './Modal';
+import { LOAD_MOVIE_DETAIL_REQUEST } from '../reducers/movie';
 
 const PosterCards = styled.div`
     margin: 0 auto;
@@ -49,6 +55,7 @@ const PosterCard = styled.img`
 `;
 
 const SimpleInfo = styled.div`
+    z-index: 1;
     display: none;
     background-color: rgb(0,0,0,0.7);
     position: absolute;
@@ -76,8 +83,24 @@ const SimpleInfo = styled.div`
 `;
 
 const SearchedMovieList = ({ searchedMovies }) => {
-  const [showMovieDetail, setShowMovieDetail] = useState(false);
+  const dispatch = useDispatch();
+  const { currentMovieDetail,
+    loadMovieDetailDone,
+    loadMovieDetailError } = useSelector((state) => state.movie);
+  const [showMovieDetail, setShowMovieDetail] = useState({ show: false, data: {} });
   const docReference = useRef();
+
+  useEffect(() => {
+    if (loadMovieDetailError) {
+      alert(loadMovieDetailError.message);
+    }
+  }, [loadMovieDetailError]);
+
+  useEffect(() => {
+    if (loadMovieDetailDone) {
+      setShowMovieDetail({ show: true, data: currentMovieDetail });
+    }
+  }, [loadMovieDetailDone]);
 
   const toggleSimpleInfo = useCallback((DOCID, show = false) => {
     if (show) {
@@ -88,11 +111,12 @@ const SearchedMovieList = ({ searchedMovies }) => {
     }
   }, []);
 
-  const toggleMovieDetail = useCallback(() => {
-    console.log('실행됨');
-    console.log(docReference.current);
-    // setShowMovieDetail((prev) => !prev);
-  }, [docReference]);
+  const toggleMovieDetail = useCallback((DOCID) => {
+    dispatch({
+      type: LOAD_MOVIE_DETAIL_REQUEST,
+      data: DOCID.trim(),
+    });
+  }, []);
 
   return (
     <PosterCards>
@@ -111,6 +135,8 @@ const SearchedMovieList = ({ searchedMovies }) => {
             });
             actorStr = arr.toString();
           }
+        } else {
+          actorStr = v._source.actors.actor.actorNm._cdata.trim();
         }
 
         return (
@@ -126,12 +152,11 @@ const SearchedMovieList = ({ searchedMovies }) => {
             <SimpleInfo
               key={v._id}
               id={v._source.DOCID._cdata}
-              ref={docReference}
             >
               <div><b>키워드 :</b> {v._source.keywords._cdata}</div>
               <div><b>장르 :</b> {v._source.genre._cdata}</div>
               <div><b>배우 :</b> {actorStr}</div>
-              <button type="button" onClick={toggleMovieDetail} style={{ zIndex: 4 }}>상세보기</button>
+
             </SimpleInfo>
 
             <div
@@ -142,15 +167,26 @@ const SearchedMovieList = ({ searchedMovies }) => {
                 left: '0',
                 width: '100%',
                 height: '100%',
-                backgroundColor: 'red',
+                cursor: 'pointer',
               }}
+              key={v._source.DOCID._cdata.trim()}
+              id={v._id}
+              ref={docReference}
               onMouseOverCapture={() => toggleSimpleInfo(v._source.DOCID._cdata, true)}
               onMouseOutCapture={() => toggleSimpleInfo(v._source.DOCID._cdata)}
+              onClick={() => toggleMovieDetail(v._source.DOCID._cdata)}
+              data-tip="상세보기"
             />
+            <ReactTooltip place="top" type="dark" effect="float" />
           </div>
         );
       })}
-      {showMovieDetail && <DetailedMovieModal toggleMovieDetail={toggleMovieDetail} />}
+      <Modal visible={showMovieDetail.show}>
+        <DetailedMovieModal
+          data={showMovieDetail.data}
+          onCloseModal={() => setShowMovieDetail({ show: false, data: {} })}
+        />
+      </Modal>
     </PosterCards>
 
   );

@@ -62,10 +62,10 @@ const Activate2FA = () => {
       const result = await axios.get('/user/QRCodeUrl');
       setQRCodeUrl(result.data);
     }
-    if (me && me.id) {
+    if (me && me.userIdx) {
       fetchData();
     }
-  }, [me && me.id]);
+  }, [me && me.userIdx]);
 
   useEffect(() => {
     if (secondAuthDone) {

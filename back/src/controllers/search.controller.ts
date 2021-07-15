@@ -4,10 +4,16 @@ import { Client } from 'elasticsearch';
 import axios from 'axios';
 // import CircularJSON from 'circular-json';
 import convert from 'xml-js';
+import reviewModel from 'src/models/review.model';
+import reviewImageModel from 'src/models/reviewImage.model';
+import userModel from 'src/models/user.model';
 
 class SearchController implements Controller {
   public path = '/search';
   public router = express.Router();
+  public review = reviewModel;
+  public reviewImage = reviewImageModel;
+  public user = userModel;
   public client;
 
   constructor() {
@@ -23,6 +29,7 @@ class SearchController implements Controller {
     this.router.post(`${this.path}/store`, this.storeMovies);
     this.router.get(`${this.path}/randomMovie`, this.getRandomMovie);
     this.router.get(`${this.path}/movie/:term`, this.searchMovies);
+    this.router.get(`${this.path}/detail/:DOCID`, this.getDetailedMovieInfo);
   }
 
   private storeMovies = async (req: Request, res: Response, next: NextFunction) => {
@@ -153,6 +160,99 @@ class SearchController implements Controller {
       for (const doc of result) {
         doc._source.posters._cdata = doc._source.posters._cdata.trim().split('|')[0];
       }
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private getDetailedMovieInfo = async (req: Request, res: Response, next: NextFunction) => {
+    const DOCID = req.params.DOCID;
+    const params = {
+      index: 'movies-1',
+      body: {
+        size: 1,
+        _source: [
+          'DOCID._cdata',
+          'plots.plot.plotText._cdata',
+          'prodYear._cdata',
+          'rating._cdata',
+          'runtime._cdata',
+          'stlls._cdata',
+          'title._cdata',
+          'keywords._cdata',
+          'genre._cdata',
+          'actors.actor.actorNm._cdata',
+        ],
+        query: {
+          match: { 'DOCID._cdata': `${DOCID}` },
+        },
+      },
+    };
+
+    try {
+      let result = await this.client.search(params);
+      result = result.hits.hits[0]._source;
+
+      /**
+       * actors(출연배우) 배열 생성
+       */
+      const actorArr = [];
+      if (!Object.prototype.hasOwnProperty.call(result.actors.actor, 'actorNm')) {
+        for (const actor of result.actors.actor) {
+          actorArr.push(actor.actorNm._cdata.trim());
+        }
+      } else {
+        actorArr.push(result.actors.actor.actorNm._cdata.trim());
+      }
+      result.actors = actorArr;
+
+      /**
+       * stlls(스틸컷) 배열 생성
+       */
+      result.stlls = result.stlls._cdata.trim().split('|');
+
+      /**
+       * 런타임
+       */
+      result.runtime = `${result.runtime._cdata.trim()}분`;
+
+      /**
+       * plots(줄거리)
+       */
+      if (!Object.prototype.hasOwnProperty.call(result.plots.plot, 'plotText')) {
+        result.plots = result.plots.plot[0].plotText._cdata.trim();
+      } else {
+        result.plots = result.plots.plot.plotText._cdata.trim();
+      }
+
+      /**
+       * 그 외
+       */
+      const propertyArr = ['DOCID', 'keywords', 'rating', 'genre', 'prodYear', 'title'];
+      for (const prop of propertyArr) {
+        result[prop] = result[prop]._cdata.trim();
+      }
+
+      const reviews = await this.review.findAll({
+        where: {
+          DOCID,
+        },
+        include: [
+          {
+            model: this.user,
+            attributes: ['userIdx', 'nickname', 'profileImgUrl'],
+          },
+          {
+            model: this.reviewImage,
+            attributes: ['reviewImgIdx', 'src'],
+          },
+        ],
+      });
+
+      result.reviews = reviews;
 
       res.status(200).json(result);
     } catch (error) {

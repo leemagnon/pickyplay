@@ -21,18 +21,26 @@ const CreateModal = styled.div`
     background-color: rgba(var(--sk_foreground_min_solid, 248, 248, 248), 1);
     border-radius: 6px;
     user-select: none;
-    padding: 30px 40px;
     z-index: 1012;
   }
 `;
 
-const Modal = ({ children }) => (
-  <CreateModal>
-    {children}
-  </CreateModal>
-);
+const Modal = (props) => {
+  const { visible = false, children } = props;
+
+  if (!visible) {
+    return null;
+  }
+
+  return (
+    <CreateModal>
+      {children}
+    </CreateModal>
+  );
+};
 
 Modal.propTypes = {
+  visible: PropTypes.bool.isRequired,
   children: PropTypes.node.isRequired,
 };
 

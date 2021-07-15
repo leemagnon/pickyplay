@@ -13,7 +13,6 @@ import DataStoredInToken from 'src/interfaces/dataStoredInToken.interface';
 import UserWithThatEmailAlreadyExistsException from 'src/exceptions/UserWithThatEmailAlreadyExistsException';
 import WrongCredentialException from 'src/exceptions/WrongCredentialException';
 import DuplicatedNicknameException from 'src/exceptions/DuplicatedNicknameException';
-import { Response } from 'express';
 import nodemailer from 'nodemailer';
 import speakeasy from 'speakeasy';
 
@@ -113,7 +112,7 @@ class AuthenticationService {
     const expiresIn = 60 * 60; // an hour
     const secret = process.env.JWT_SECRET;
     const dataStoredInToken: DataStoredInToken = {
-      id: user.id,
+      userIdx: user.userIdx,
     };
     return {
       expiresIn,

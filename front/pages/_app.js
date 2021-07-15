@@ -19,13 +19,16 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const PickyPlay = ({ Component }) => {
-  const [browserWidth, setBrowserWidth] = useState(null);
+  const [browserSize, setBrowserSize] = useState({
+    browserWidth: 0,
+    browserHeight: 0,
+  });
 
   useEffect(() => {
-    setBrowserWidth(window.innerWidth);
+    setBrowserSize({ browserWidth: window.innerWidth, browserHeight: window.innerHeight });
 
     window.addEventListener('resize', () => {
-      setBrowserWidth(window.innerWidth);
+      setBrowserSize({ browserWidth: window.innerWidth, browserHeight: window.innerHeight });
     });
   }, []);
 
@@ -37,7 +40,7 @@ const PickyPlay = ({ Component }) => {
         <meta charSet="utf-8" />
         <title>PickyPlay</title>
       </Head>
-      <AppProvider value={browserWidth}>
+      <AppProvider value={browserSize}>
         <Component />
       </AppProvider>
     </>

@@ -13,9 +13,9 @@ async function authMiddleware(req: RequestWithUser, res: Response, next: NextFun
     try {
       // 만약 토큰이 잘못됐거나 폐기됐으면 jwt.verify가 error를 던진다.
       const verificationResponse = jwt.verify(cookies.Authorization, secret) as DataStoredInToken;
-      const { id } = verificationResponse;
+      const { userIdx } = verificationResponse;
       const user = await userModel.findOne({
-        where: { id },
+        where: { userIdx },
         attributes: {
           exclude: ['password', 'twoFactorAuthenticationCode'],
         },

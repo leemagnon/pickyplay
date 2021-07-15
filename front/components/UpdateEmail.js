@@ -62,7 +62,7 @@ const InputError = styled.div`
 const UpdateEmail = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const browserWidth = useContext(AppContext);
+  const browserSize = useContext(AppContext);
   const { me,
     updateUserEmailLoading,
     updateUserEmailDone,
@@ -166,7 +166,7 @@ const UpdateEmail = () => {
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column' }}>
       <Title>이메일 변경</Title>
       <Contents>
-        <UpdateEmailForm browserWidth={browserWidth} onFinish={onSubmit}>
+        <UpdateEmailForm browserWidth={browserSize.browserWidth} onFinish={onSubmit}>
           <div>
             <label htmlFor="email">이메일</label>
             <br />

@@ -130,7 +130,7 @@ const aTagStyle = {
 
 /* 로그인 컴포넌트 */
 const LogIn = () => {
-  const browserWidth = useContext(AppContext);
+  const browserSize = useContext(AppContext);
   const dispatch = useDispatch();
   const {
     logInError,
@@ -148,10 +148,10 @@ const LogIn = () => {
   const PasswordInput = passwordRequiredError ? 'error' : null;
 
   useEffect(() => { // LOAD_MY_INFO_REQUEST
-    if (me && me.id) {
+    if (me && me.userIdx) {
       Router.replace('/');
     }
-  }, [me && me.id]);
+  }, [me && me.userIdx]);
 
   useEffect(() => { // 로그인 에러
     if (logInError) {
@@ -216,7 +216,7 @@ const LogIn = () => {
           LAY
         </Logo>
       </Header>
-      <LogInBody browserWidth={browserWidth}>
+      <LogInBody browserWidth={browserSize.browserWidth}>
         <form onSubmit={onSubmit}>
           <LoginText className="font-nanum-gothic">로그인</LoginText>
 
@@ -258,9 +258,9 @@ const LogIn = () => {
           </Link>
         </SignUp>
       </LogInBody>
-      {showOTPFormModal && (
-      <Modal><OTPForm email={email} onCloseModal={setShowOTPFormModal} /></Modal>
-      )}
+      <Modal visible={showOTPFormModal}>
+        <OTPForm email={email} onCloseModal={() => setShowOTPFormModal(false)} />
+      </Modal>
       <Footer className="font-nanum-gothic">
         <div>
           <div style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '60px' }}>

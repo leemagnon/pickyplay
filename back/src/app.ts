@@ -59,7 +59,7 @@ class App {
     }
     this.app.use('/', express.static(path.join(__dirname, 'uploads'))); // '/' => localhost:5000
     this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: false }));
+    this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser()); // string인 cookie를 object로 변환하는 미들웨어. request.cookies로 쿠키 내용에 접근 가능해진다.
   }
 

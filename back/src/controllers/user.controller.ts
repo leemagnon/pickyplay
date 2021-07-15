@@ -36,7 +36,7 @@ class UserController implements Controller {
 
   private disable2FA = (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      this.userService.disable2FA(req.user.id);
+      this.userService.disable2FA(req.user.userIdx);
       res.status(200).send('ok');
     } catch (error) {
       console.error(error);

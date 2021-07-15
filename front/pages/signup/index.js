@@ -70,7 +70,7 @@ const InputError = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const browserWidth = useContext(AppContext);
+  const browserSize = useContext(AppContext);
   const {
     getEmailAuthCodeLoading,
     signUpLoading,
@@ -109,10 +109,10 @@ const Signup = () => {
   const PasswordInput = passwordRequiredError || passwordLengthError ? 'error' : null;
 
   useEffect(() => { // 로그인한 상태
-    if (me && me.id) {
+    if (me && me.userIdx) {
       Router.replace('/');
     }
-  }, [me && me.id]);
+  }, [me && me.userIdx]);
 
   useEffect(() => {
     if (signUpDone) {
@@ -326,7 +326,7 @@ const Signup = () => {
           <span>P</span>
           LAY
         </Logo>
-        <SignUpForm browserWidth={browserWidth} onFinish={onSubmit}>
+        <SignUpForm browserWidth={browserSize.browserWidth} onFinish={onSubmit}>
           <div>
             <label htmlFor="email">이메일</label>
             <br />

@@ -41,7 +41,7 @@ export const uploadProfileImg = async (req, res, next) => {
   }
 };
 
-export const uploadPostImgs = async (req, res, next) => {
+export const uploadReviewImgs = async (req, res, next) => {
   try {
     console.log(req.files);
     res.json(req.files.map((v) => v.location));

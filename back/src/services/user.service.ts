@@ -16,7 +16,7 @@ class UserService {
       {
         twoFactorAuthenticationCode: base32,
       },
-      { where: { id: user.id } },
+      { where: { userIdx: user.userIdx } },
     );
 
     return QRCode.toDataURL(otpauthUrl);
@@ -33,22 +33,22 @@ class UserService {
     };
   }
 
-  public async enable2FA(id: string) {
+  public async enable2FA(userIdx: number) {
     await this.user.update(
       {
         is2FAOn: true,
       },
-      { where: { id } },
+      { where: { userIdx } },
     );
   }
 
-  public async disable2FA(id: string) {
+  public async disable2FA(userIdx: number) {
     await this.user.update(
       {
         twoFactorAuthenticationCode: null,
         is2FAOn: false,
       },
-      { where: { id } },
+      { where: { userIdx } },
     );
   }
 
@@ -60,7 +60,7 @@ class UserService {
         {
           email: newEmail,
         },
-        { where: { id: req.user.id } },
+        { where: { userIdx: req.user.userIdx } },
       );
     } else {
       throw new UserWithThatEmailAlreadyExistsException(newEmail);
@@ -74,7 +74,7 @@ class UserService {
       {
         password: newPassword,
       },
-      { where: { id: req.user.id }, individualHooks: true },
+      { where: { userIdx: req.user.userIdx }, individualHooks: true },
     );
   }
 }

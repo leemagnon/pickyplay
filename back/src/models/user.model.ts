@@ -11,10 +11,20 @@ import {
   BeforeCreate,
   AllowNull,
   Default,
+  AutoIncrement,
+  PrimaryKey,
+  HasMany,
 } from 'sequelize-typescript';
+import Review from 'src/models/review.model';
+import Like from 'src/models/like.model';
 
 @Table
 export default class User extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  userIdx: number;
+
   @IsEmail
   @Unique
   @AllowNull(false)
@@ -42,10 +52,15 @@ export default class User extends Model {
   @Column(DataType.STRING)
   profileImgUrl: string;
 
+  @HasMany(() => Review)
+  reviews: Review[];
+
+  @HasMany(() => Like)
+  likes: Like[];
+
   @BeforeUpdate
   @BeforeCreate
   static async encryptPassword(instance: User) {
-    console.log('왜 실행 안 됨?');
     instance.password = await bcrypt.hash(instance.password, 10);
   }
 }
