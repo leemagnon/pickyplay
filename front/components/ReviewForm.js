@@ -6,9 +6,16 @@ import { ADD_REVIEW_REQUEST, UPLOAD_REVIEW_IMAGES_REQUEST, REMOVE_REVIEW_IMAGE }
 
 const ReviewForm = ({ DOCID }) => {
   const dispatch = useDispatch();
-  const { reviewImgPaths, addReviewDone } = useSelector((state) => state.movie);
+  const { me } = useSelector((state) => state.user);
+  const { reviewImgPaths, addReviewDone, addReviewError } = useSelector((state) => state.movie);
   const [text, setText] = useState('');
   const imageInput = useRef();
+
+  useEffect(() => {
+    if (addReviewError) {
+      alert(addReviewError.message);
+    }
+  }, [addReviewError]);
 
   useEffect(() => {
     if (addReviewDone) {
@@ -37,6 +44,9 @@ const ReviewForm = ({ DOCID }) => {
   }, [text, reviewImgPaths]);
 
   const onClickImageUpload = useCallback(() => {
+    if (!me) {
+      return alert('로그인이 필요합니다.');
+    }
     imageInput.current.click();
   }, [imageInput.current]);
 
@@ -60,12 +70,12 @@ const ReviewForm = ({ DOCID }) => {
   }, []);
 
   return (
-    <Form encType="multipart/form-data" onFinish={onSubmit}>
+    <Form encType="multipart/form-data" onFinish={onSubmit} style={{ marginBottom: '30px' }}>
       <Input.TextArea
         value={text}
         onChange={onChangeText}
         maxLength={140}
-        placeholder="어떤 신기한 일이 있었나요?"
+        placeholder="감상평을 적어주세요."
       />
       <div>
         <input type="file" name="reviewImgs" multiple hidden ref={imageInput} onChange={onChangeImages} />

@@ -1,5 +1,5 @@
 import { CreateLikeDto, RemoveLikeDto } from 'src/dtos/like.dto';
-import { CreateReviewDto, RemoveReviewDto } from 'src/dtos/review.dto';
+import { CreateReviewDto, UpdateReviewData } from 'src/dtos/review.dto';
 import likeModel from 'src/models/like.model';
 import reviewModel from 'src/models/review.model';
 import reviewImageModel from 'src/models/reviewImage.model';
@@ -16,6 +16,8 @@ class MovieService {
       const user = await this.user.findOne({ where: { userIdx: likeData.userIdx } });
       const like = await this.like.create(likeData);
       await user.$add('likes', like);
+
+      return like;
     } catch (error) {
       console.error(error);
       throw error;
@@ -24,9 +26,9 @@ class MovieService {
 
   public async removeLike(likeData: RemoveLikeDto) {
     try {
-      const user = await this.user.findOne({ where: { userIdx: likeData.userIdx } });
-      const like = await this.like.findOne({ where: { userIdx: likeData.userIdx, DOCID: likeData.DOCID } });
-      await user.$remove('likes', like);
+      await this.like.destroy({ where: { userIdx: likeData.userIdx, DOCID: likeData.DOCID } });
+
+      return 'deleted successfully';
     } catch (error) {
       console.error(error);
       throw error;
@@ -64,6 +66,29 @@ class MovieService {
       });
 
       return fullReview;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  public async removeReview(reviewIdx: number) {
+    try {
+      await this.reviewImage.destroy({ where: { reviewIdx } });
+      await this.review.destroy({ where: { reviewIdx } });
+
+      return 'deleted successfully';
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  public async updateReview(reviewData: UpdateReviewData) {
+    try {
+      await this.review.update({ content: reviewData.content }, { where: { reviewIdx: reviewData.reviewIdx } });
+
+      return 'updated successfully';
     } catch (error) {
       console.error(error);
       throw error;

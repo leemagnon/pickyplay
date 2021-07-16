@@ -5,6 +5,8 @@ import WrongAuthenticationTokenException from 'src/exceptions/WrongAuthenticatio
 import DataStoredInToken from 'src/interfaces/dataStoredInToken.interface';
 import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 import userModel from 'src/models/user.model';
+import likeModel from 'src/models/like.model';
+import reviewModel from 'src/models/review.model';
 
 async function authMiddleware(req: RequestWithUser, res: Response, next: NextFunction) {
   const cookies = req.cookies;
@@ -19,6 +21,14 @@ async function authMiddleware(req: RequestWithUser, res: Response, next: NextFun
         attributes: {
           exclude: ['password', 'twoFactorAuthenticationCode'],
         },
+        include: [
+          {
+            model: likeModel,
+          },
+          {
+            model: reviewModel,
+          },
+        ],
       });
       if (user) {
         req.user = user; // 로그인한 사람은 req 객체에 user 정보를 가지고 있는다.

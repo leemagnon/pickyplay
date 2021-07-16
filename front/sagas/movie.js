@@ -10,13 +10,24 @@ import {
   LOAD_MOVIE_DETAIL_REQUEST,
   LOAD_MOVIE_DETAIL_SUCCESS,
   LOAD_MOVIE_DETAIL_FAILURE,
+  ADD_LIKE_REQUEST,
+  ADD_LIKE_SUCCESS,
+  ADD_LIKE_FAILURE,
+  REMOVE_LIKE_REQUEST,
+  REMOVE_LIKE_SUCCESS,
+  REMOVE_LIKE_FAILURE,
   ADD_REVIEW_REQUEST,
   ADD_REVIEW_SUCCESS,
   ADD_REVIEW_FAILURE,
   UPLOAD_REVIEW_IMAGES_REQUEST,
   UPLOAD_REVIEW_IMAGES_SUCCESS,
   UPLOAD_REVIEW_IMAGES_FAILURE,
-  REMOVE_REVIEW_IMAGE,
+  REMOVE_REVIEW_REQUEST,
+  REMOVE_REVIEW_SUCCESS,
+  REMOVE_REVIEW_FAILURE,
+  UPDATE_REVIEW_REQUEST,
+  UPDATE_REVIEW_SUCCESS,
+  UPDATE_REVIEW_FAILURE,
 } from '../reducers/movie';
 
 function loadRandomMovieAPI() {
@@ -76,6 +87,44 @@ function* loadMovieDetail(action) {
   }
 }
 
+function addLikeAPI(data) {
+  return axios.patch(`/movie/like/${data}`);
+}
+function* addLike(action) {
+  try {
+    const result = yield call(addLikeAPI, action.data);
+    yield put({
+      type: ADD_LIKE_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: ADD_LIKE_FAILURE,
+      error: error.response.data,
+    });
+  }
+}
+
+function removeLikeAPI(data) {
+  return axios.delete(`/movie/like/${data}`);
+}
+function* removeLike(action) {
+  try {
+    const result = yield call(removeLikeAPI, action.data);
+    yield put({
+      type: REMOVE_LIKE_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: REMOVE_LIKE_FAILURE,
+      error: error.response.data,
+    });
+  }
+}
+
 function addReviewAPI(data) {
   return axios.post('/movie/review', data);
 }
@@ -114,6 +163,44 @@ function* uploadReviewImgs(action) {
   }
 }
 
+function removeReviewAPI(data) {
+  return axios.delete(`/movie/review/${data}`);
+}
+function* removeReview(action) {
+  try {
+    const result = yield call(removeReviewAPI, action.data);
+    yield put({
+      type: REMOVE_REVIEW_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: REMOVE_REVIEW_FAILURE,
+      error: error.response.data,
+    });
+  }
+}
+
+function updateReviewAPI(data) {
+  return axios.post('/movie/update/review', data);
+}
+function* updateReview(action) {
+  try {
+    const result = yield call(updateReviewAPI, action.data);
+    yield put({
+      type: UPDATE_REVIEW_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: UPDATE_REVIEW_FAILURE,
+      error: error.response.data,
+    });
+  }
+}
+
 function* watchLoadRandomMovie() {
   yield takeLatest(LOAD_RANDOM_MOVIE_REQUEST, loadRandomMovie);
 }
@@ -123,11 +210,23 @@ function* watchSearchMovie() {
 function* watchLoadMovieDetail() {
   yield takeLatest(LOAD_MOVIE_DETAIL_REQUEST, loadMovieDetail);
 }
+function* watchAddLike() {
+  yield takeLatest(ADD_LIKE_REQUEST, addLike);
+}
+function* watchRemoveLike() {
+  yield takeLatest(REMOVE_LIKE_REQUEST, removeLike);
+}
 function* watchAddReview() {
   yield takeLatest(ADD_REVIEW_REQUEST, addReview);
 }
 function* watchUploadReviewImgs() {
   yield takeLatest(UPLOAD_REVIEW_IMAGES_REQUEST, uploadReviewImgs);
+}
+function* watchRemoveReview() {
+  yield takeLatest(REMOVE_REVIEW_REQUEST, removeReview);
+}
+function* watchUpdateReview() {
+  yield takeLatest(UPDATE_REVIEW_REQUEST, updateReview);
 }
 
 export default function* movieSaga() {
@@ -135,7 +234,11 @@ export default function* movieSaga() {
     fork(watchLoadRandomMovie),
     fork(watchSearchMovie),
     fork(watchLoadMovieDetail),
+    fork(watchAddLike),
+    fork(watchRemoveLike),
     fork(watchAddReview),
     fork(watchUploadReviewImgs),
+    fork(watchRemoveReview),
+    fork(watchUpdateReview),
   ]);
 }

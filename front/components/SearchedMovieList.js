@@ -193,7 +193,7 @@ const SearchedMovieList = ({ searchedMovies }) => {
 };
 
 SearchedMovieList.propTypes = {
-  searchedMovies: PropTypes.node.isRequired,
+  searchedMovies: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default SearchedMovieList;

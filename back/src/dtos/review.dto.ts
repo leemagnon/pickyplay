@@ -11,10 +11,10 @@ export class CreateReviewDto {
   public content: string;
 }
 
-export class RemoveReviewDto {
+export class UpdateReviewData {
   @IsNumber()
   public reviewIdx: number;
 
-  @IsNumber()
-  public userIdx: number;
+  @IsString()
+  public content: string;
 }

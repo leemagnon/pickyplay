@@ -17,6 +17,12 @@ export const initialState = {
   loadMovieDetailLoading: false, // 상세정보 로딩 중
   loadMovieDetailDone: false,
   loadMovieDetailError: null,
+  addLikeLoading: false, // 좋아요 추가 중
+  addLikeDone: false,
+  addLikeError: null,
+  removeLikeLoading: false, // 좋아요 제거 중
+  removeLikeDone: false,
+  removeLikeError: null,
   addReviewLoading: false, // 리뷰 추가 중
   addReviewDone: false,
   addReviewError: null,
@@ -36,6 +42,14 @@ export const SEARCH_MOVIE_FAILURE = 'SEARCH_MOVIE_FAILURE';
 export const LOAD_MOVIE_DETAIL_REQUEST = 'LOAD_MOVIE_DETAIL_REQUEST';
 export const LOAD_MOVIE_DETAIL_SUCCESS = 'LOAD_MOVIE_DETAIL_SUCCESS';
 export const LOAD_MOVIE_DETAIL_FAILURE = 'LOAD_MOVIE_DETAIL_FAILURE';
+
+export const ADD_LIKE_REQUEST = 'ADD_LIKE_REQUEST';
+export const ADD_LIKE_SUCCESS = 'ADD_LIKE_SUCCESS';
+export const ADD_LIKE_FAILURE = 'ADD_LIKE_FAILURE';
+
+export const REMOVE_LIKE_REQUEST = 'REMOVE_LIKE_REQUEST';
+export const REMOVE_LIKE_SUCCESS = 'REMOVE_LIKE_SUCCESS';
+export const REMOVE_LIKE_FAILURE = 'REMOVE_LIKE_FAILURE';
 
 export const ADD_REVIEW_REQUEST = 'ADD_REVIEW_REQUEST';
 export const ADD_REVIEW_SUCCESS = 'ADD_REVIEW_SUCCESS';
@@ -102,6 +116,35 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_MOVIE_DETAIL_FAILURE:
       draft.loadMovieDetailLoading = false;
       draft.loadMovieDetailError = action.error;
+      break;
+    case ADD_LIKE_REQUEST:
+      draft.addLikeLoading = true;
+      draft.addLikeDone = false;
+      draft.addLikeError = null;
+      break;
+    case ADD_LIKE_SUCCESS:
+      draft.addLikeLoading = false;
+      draft.addLikeDone = true;
+      draft.currentMovieDetail.likers.push({ userIdx: action.data.userIdx });
+      break;
+    case ADD_LIKE_FAILURE:
+      draft.addLikeLoading = false;
+      draft.addLikeError = action.error;
+      break;
+    case REMOVE_LIKE_REQUEST:
+      draft.removeLikeLoading = true;
+      draft.removeLikeDone = false;
+      draft.removeLikeError = null;
+      break;
+    case REMOVE_LIKE_SUCCESS:
+      draft.removeLikeLoading = false;
+      draft.removeLikeDone = true;
+      draft.currentMovieDetail.likers = draft.currentMovieDetail.likers
+        .filter((v) => v.userIdx !== action.data.userIdx);
+      break;
+    case REMOVE_LIKE_FAILURE:
+      draft.removeLikeLoading = false;
+      draft.removeLikeError = action.error;
       break;
     case ADD_REVIEW_REQUEST:
       draft.addReviewLoading = true;

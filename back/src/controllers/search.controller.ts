@@ -4,6 +4,7 @@ import { Client } from 'elasticsearch';
 import axios from 'axios';
 // import CircularJSON from 'circular-json';
 import convert from 'xml-js';
+import likeModel from 'src/models/like.model';
 import reviewModel from 'src/models/review.model';
 import reviewImageModel from 'src/models/reviewImage.model';
 import userModel from 'src/models/user.model';
@@ -11,6 +12,7 @@ import userModel from 'src/models/user.model';
 class SearchController implements Controller {
   public path = '/search';
   public router = express.Router();
+  public like = likeModel;
   public review = reviewModel;
   public reviewImage = reviewImageModel;
   public user = userModel;
@@ -250,9 +252,19 @@ class SearchController implements Controller {
             attributes: ['reviewImgIdx', 'src'],
           },
         ],
+        order: [['createdAt', 'DESC']],
       });
 
       result.reviews = reviews;
+
+      const likers = await this.like.findAll({
+        where: {
+          DOCID,
+        },
+        attributes: ['likeIdx', 'userIdx'],
+      });
+
+      result.likers = likers;
 
       res.status(200).json(result);
     } catch (error) {

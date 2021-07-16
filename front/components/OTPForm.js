@@ -80,7 +80,7 @@ const OTPForm = ({ email, onCloseModal }) => {
   }, [twoFactorAuthenticationCode, email]);
 
   return (
-    <div style={{ textAlign: 'center', padding: '30px 40px' }}>
+    <div style={{ textAlign: 'center', padding: '30px 40px', background: 'white' }}>
       <CloseModalButton onClick={onCloseOTPForm}>&times;</CloseModalButton>
       <form onSubmit={onSubmit}>
         <div>
