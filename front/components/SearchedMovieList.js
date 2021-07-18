@@ -97,10 +97,10 @@ const SearchedMovieList = ({ searchedMovies }) => {
   }, [loadMovieDetailError]);
 
   useEffect(() => {
-    if (loadMovieDetailDone) {
+    if (loadMovieDetailDone && currentMovieDetail) {
       setShowMovieDetail({ show: true, data: currentMovieDetail });
     }
-  }, [loadMovieDetailDone]);
+  }, [loadMovieDetailDone && currentMovieDetail]);
 
   const toggleSimpleInfo = useCallback((DOCID, show = false) => {
     if (show) {

@@ -5,12 +5,20 @@ export const initialState = {
     DOCID: '',
     stlls: [],
   },
+  recommendedMovies: {
+    top10Movies: [],
+    randomMovies: [],
+    randomGenre: '',
+  },
   searchedMovies: [],
-  currentMovieDetail: {},
+  currentMovieDetail: null,
   reviewImgPaths: [], // 미리보기용
-  loadRandomMovieLoading: false, // 랜덤 포스터 로딩 중
+  loadRandomMovieLoading: false, // 랜덤 스틸컷 로딩 중
   loadRandomMovieDone: false,
   loadRandomMovieError: null,
+  loadRecommendedMoviesLoading: false, // 추천 영화 로딩 중
+  loadRecommendedMoviesDone: false,
+  loadRecommendedMoviesError: null,
   searchMovieLoading: false, // 영화 검색 중
   searchMovieDone: false,
   searchMovieError: null,
@@ -34,6 +42,10 @@ export const initialState = {
 export const LOAD_RANDOM_MOVIE_REQUEST = 'LOAD_RANDOM_MOVIE_REQUEST';
 export const LOAD_RANDOM_MOVIE_SUCCESS = 'LOAD_RANDOM_MOVIE_SUCCESS';
 export const LOAD_RANDOM_MOVIE_FAILURE = 'LOAD_RANDOM_MOVIE_FAILURE';
+
+export const LOAD_RECOMMENDED_MOVIES_REQUEST = 'LOAD_RECOMMENDED_MOVIES_REQUEST';
+export const LOAD_RECOMMENDED_MOVIES_SUCCESS = 'LOAD_RECOMMENDED_MOVIES_SUCCESS';
+export const LOAD_RECOMMENDED_MOVIES_FAILURE = 'LOAD_RECOMMENDED_MOVIES_FAILURE';
 
 export const SEARCH_MOVIE_REQUEST = 'SEARCH_MOVIE_REQUEST';
 export const SEARCH_MOVIE_SUCCESS = 'SEARCH_MOVIE_SUCCESS';
@@ -69,6 +81,8 @@ export const UPLOAD_REVIEW_IMAGES_FAILURE = 'UPLOAD_REVIEW_IMAGES_FAILURE';
 
 export const REMOVE_REVIEW_IMAGE = 'REMOVE_REVIEW_IMAGE';
 
+export const REMOVE_CURRENT_MOVIE = 'REMOVE_CURRENT_MOVIE';
+
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
     case LOAD_RANDOM_MOVIE_REQUEST:
@@ -87,6 +101,24 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_RANDOM_MOVIE_FAILURE:
       draft.loadRandomMovieLoading = false;
       draft.loadRandomMovieError = action.error;
+      break;
+    case LOAD_RECOMMENDED_MOVIES_REQUEST:
+      draft.loadRecommendedMoviesLoading = true;
+      draft.loadRecommendedMoviesDone = false;
+      draft.loadRecommendedMoviesError = null;
+      break;
+    case LOAD_RECOMMENDED_MOVIES_SUCCESS:
+      draft.loadRecommendedMoviesLoading = false;
+      draft.loadRecommendedMoviesDone = true;
+      draft.recommendedMovies = {
+        top10Movies: action.data.top10Movies,
+        randomMovies: action.data.randomMovies,
+        randomGenre: action.data.randomGenre,
+      };
+      break;
+    case LOAD_RECOMMENDED_MOVIES_FAILURE:
+      draft.loadRecommendedMoviesLoading = false;
+      draft.loadRecommendedMoviesError = action.error;
       break;
     case SEARCH_MOVIE_REQUEST:
       draft.searchMovieLoading = true;
@@ -208,6 +240,9 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       break;
     case REMOVE_REVIEW_IMAGE:
       draft.reviewImgPaths = draft.reviewImgPaths.filter((v, i) => i !== action.data);
+      break;
+    case REMOVE_CURRENT_MOVIE:
+      draft.currentMovieDetail = null;
       break;
     default:
       break;

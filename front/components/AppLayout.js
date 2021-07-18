@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Slider from 'react-slick';
+import gravatar from 'gravatar';
 import styled, { createGlobalStyle } from 'styled-components';
 import Menu from './Menu';
-import { LOAD_RANDOM_MOVIE_REQUEST, SEARCH_MOVIE_REQUEST } from '../reducers/movie';
 import SearchedMovieList from './SearchedMovieList';
-import gravatar from 'gravatar';
+import RecommendedMovieList from './RecommendedMovieList';
+import { SEARCH_MOVIE_REQUEST, REMOVE_CURRENT_MOVIE } from '../reducers/movie';
 import { LOG_OUT_REQUEST } from '../reducers/user';
 
 const Wrapper1 = styled.div`
@@ -149,11 +150,11 @@ const settings = { // slider 세팅
   autoplaySpeed: 2000,
 };
 
-const AppLayout = ({ children }) => {
+const AppLayout = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { me } = useSelector((state) => state.user);
-  const { randomMovie, loadRandomMovieDone, searchedMovies } = useSelector((state) => state.movie);
+  const { randomMovie, recommendedMovies, searchedMovies, loadRandomMovieDone } = useSelector((state) => state.movie);
   const [isHome, setIsHome] = useState(true);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -167,9 +168,12 @@ const AppLayout = ({ children }) => {
       setIsHome(true);
     }
     dispatch({
+      type: REMOVE_CURRENT_MOVIE
+    })
+    dispatch({
       type: SEARCH_MOVIE_REQUEST,
       data: e.target.value,
-    })
+    });
   }, []);
 
   useEffect(() => {
@@ -183,12 +187,6 @@ const AppLayout = ({ children }) => {
       },
       true,
     );
-  }, []);
-
-  useEffect(() => {
-    dispatch({
-      type: LOAD_RANDOM_MOVIE_REQUEST,
-    });
   }, []);
 
   const toggleUserProfile = useCallback(() => {
@@ -272,7 +270,7 @@ const AppLayout = ({ children }) => {
       </Wrapper1>
 
       <Wrapper2>
-        {isHome ? <div>{children}</div> : <SearchedMovieList searchedMovies={searchedMovies} />}
+        {isHome ? <RecommendedMovieList recommendedMovies={recommendedMovies} /> : <SearchedMovieList searchedMovies={searchedMovies} />}
         <Footer className="font-nanum-gothic">
           <div>
             <small>

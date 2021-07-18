@@ -1,84 +1,27 @@
 import React from 'react';
-import styled from 'styled-components';
 import { END } from 'redux-saga';
 import axios from 'axios';
 
 import AppLayout from '../components/AppLayout';
 import wrapper from '../store/configureStore';
 import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
-
-const Contents = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  flex: 9;
-`;
+import { LOAD_RANDOM_MOVIE_REQUEST, LOAD_RECOMMENDED_MOVIES_REQUEST } from '../reducers/movie';
 
 // 프론트랑 브라우저 둘 다에서 실행됨.
 const Home = () => (
-  <AppLayout>
-    <Contents>
-      <div>sssssss</div>
-      <div>sssssss</div>
-      <div>sssssss</div>
-      <div>sssssss</div>
-      <div>sssssss</div>
-      <div>sssssss</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>asd</div>
-      <div>ddd</div>
-      <div>ddd</div>
-      <div>ddd</div>
-      <div>ddd</div><div>duuu</div><div>uuu</div><div>uuu</div><div>uuu</div><div>dduuuud</div>
-    </Contents>
-  </AppLayout>
+  <AppLayout />
 );
 
 // 프론트 서버에서 실행됨.
 export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  context.store.dispatch({
+    type: LOAD_RANDOM_MOVIE_REQUEST,
+  });
+
+  context.store.dispatch({
+    type: LOAD_RECOMMENDED_MOVIES_REQUEST,
+  });
+
   // 쿠키
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';

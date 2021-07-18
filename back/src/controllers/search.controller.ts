@@ -8,6 +8,7 @@ import likeModel from 'src/models/like.model';
 import reviewModel from 'src/models/review.model';
 import reviewImageModel from 'src/models/reviewImage.model';
 import userModel from 'src/models/user.model';
+import Sequelize from 'sequelize';
 
 class SearchController implements Controller {
   public path = '/search';
@@ -30,6 +31,7 @@ class SearchController implements Controller {
   private initializeRoutes() {
     this.router.post(`${this.path}/store`, this.storeMovies);
     this.router.get(`${this.path}/randomMovie`, this.getRandomMovie);
+    this.router.get(`${this.path}/recommendedMovies`, this.getRecommendedMovies);
     this.router.get(`${this.path}/movie/:term`, this.searchMovies);
     this.router.get(`${this.path}/detail/:DOCID`, this.getDetailedMovieInfo);
   }
@@ -104,6 +106,147 @@ class SearchController implements Controller {
       result[0]._source.stlls._cdata = result[0]._source.stlls._cdata.trim().split('|');
 
       res.status(200).json(result[0]);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private getRecommendedMovies = async (req: Request, res: Response, next: NextFunction) => {
+    /** 제일 좋아요 수가 많은 10개 영화 출력 */
+    const top10Movies = [];
+    /** 랜덤 장르 [코메디, 멜로드라마, 범죄, 스릴러, 역사, SF, 스포츠, 액션, 어드벤처, 판타지, 청춘영화, 가족] 중 영화 20개 추천 */
+    const genres = [
+      '코메디',
+      '멜로드라마',
+      '범죄',
+      '스릴러',
+      '역사',
+      'SF',
+      '스포츠',
+      '액션',
+      '어드벤처',
+      '판타지',
+      '청춘영화',
+      '가족',
+    ];
+    const random = Math.floor(Math.random() * genres.length);
+    const randomGenre = genres[random];
+
+    const params2 = {
+      index: 'movies-1',
+      body: {
+        size: 20,
+        _source: [
+          'DOCID._cdata',
+          'title._cdata',
+          'posters._cdata',
+          'keywords._cdata',
+          'genre._cdata',
+          'actors.actor.actorNm._cdata',
+        ],
+        query: {
+          bool: {
+            should: [
+              {
+                match: {
+                  'genre._cdata': `${randomGenre}`,
+                },
+              },
+              {
+                function_score: {
+                  functions: [
+                    {
+                      random_score: {},
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+    };
+
+    try {
+      /** 1. 제일 좋아요 수가 많은 10개 영화 출력 */
+      const likes = await this.like.findAll({
+        attributes: ['DOCID', [Sequelize.fn('COUNT', Sequelize.col('DOCID')), 'count']],
+        group: ['DOCID'],
+        order: Sequelize.literal('count DESC'),
+        limit: 10,
+      });
+
+      for (const like of likes) {
+        const params1 = {
+          index: 'movies-1',
+          body: {
+            size: 1,
+            _source: [
+              'DOCID._cdata',
+              'title._cdata',
+              'posters._cdata',
+              'keywords._cdata',
+              'genre._cdata',
+              'actors.actor.actorNm._cdata',
+            ],
+            query: {
+              match: { 'DOCID._cdata': `${like.DOCID}` },
+            },
+          },
+        };
+
+        let result = await this.client.search(params1);
+        result = result.hits.hits[0]._source;
+        top10Movies.push(result);
+
+        result.posters = result.posters._cdata.trim().split('|')[0];
+        result.DOCID = result.DOCID._cdata.trim();
+        result.title = result.title._cdata.trim();
+        result.keywords = result.keywords._cdata.trim();
+        result.genre = result.genre._cdata.trim();
+
+        /**
+         * actors(출연배우) 배열 생성
+         */
+        const actorArr = [];
+        if (!Object.prototype.hasOwnProperty.call(result.actors.actor, 'actorNm')) {
+          for (const actor of result.actors.actor) {
+            actorArr.push(actor.actorNm._cdata.trim());
+          }
+        } else {
+          actorArr.push(result.actors.actor.actorNm._cdata.trim());
+        }
+        result.actors = actorArr;
+      }
+
+      /** 2. 랜덤 장르 [코메디, 멜로드라마, 범죄, 스릴러, 역사, SF, 스포츠, 액션, 어드벤처, 판타지, 청춘영화, 가족] 중 영화 20개 추천 */
+      let result = await this.client.search(params2);
+      result = result.hits.hits;
+
+      // // 포스터, DOCID, 타이틀, 키워드, 장르, 배우 데이터 정리
+      for (const doc of result) {
+        doc._source.posters = doc._source.posters._cdata.trim().split('|')[0];
+        doc._source.DOCID = doc._source.DOCID._cdata.trim();
+        doc._source.title = doc._source.title._cdata.trim();
+        doc._source.keywords = doc._source.keywords._cdata.trim();
+        doc._source.genre = doc._source.genre._cdata.trim();
+
+        /**
+         * actors(출연배우) 배열 생성
+         */
+        const actorArr = [];
+        if (!Object.prototype.hasOwnProperty.call(doc._source.actors.actor, 'actorNm')) {
+          for (const actor of doc._source.actors.actor) {
+            actorArr.push(actor.actorNm._cdata.trim());
+          }
+        } else {
+          actorArr.push(doc._source.actors.actor.actorNm._cdata.trim());
+        }
+        doc._source.actors = actorArr;
+      }
+
+      res.status(200).json({ top10Movies, randomMovies: result, randomGenre });
     } catch (error) {
       console.error(error);
       next(error);

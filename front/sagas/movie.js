@@ -4,6 +4,9 @@ import {
   LOAD_RANDOM_MOVIE_REQUEST,
   LOAD_RANDOM_MOVIE_SUCCESS,
   LOAD_RANDOM_MOVIE_FAILURE,
+  LOAD_RECOMMENDED_MOVIES_REQUEST,
+  LOAD_RECOMMENDED_MOVIES_SUCCESS,
+  LOAD_RECOMMENDED_MOVIES_FAILURE,
   SEARCH_MOVIE_REQUEST,
   SEARCH_MOVIE_SUCCESS,
   SEARCH_MOVIE_FAILURE,
@@ -44,6 +47,25 @@ function* loadRandomMovie() {
     console.error(error);
     yield put({
       type: LOAD_RANDOM_MOVIE_FAILURE,
+      error: error.response.data,
+    });
+  }
+}
+
+function loadRecommendedMoviesAPI() {
+  return axios.get('/search/recommendedMovies');
+}
+function* loadRecommendedMovies() {
+  try {
+    const result = yield call(loadRecommendedMoviesAPI);
+    yield put({
+      type: LOAD_RECOMMENDED_MOVIES_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: LOAD_RECOMMENDED_MOVIES_FAILURE,
       error: error.response.data,
     });
   }
@@ -204,6 +226,9 @@ function* updateReview(action) {
 function* watchLoadRandomMovie() {
   yield takeLatest(LOAD_RANDOM_MOVIE_REQUEST, loadRandomMovie);
 }
+function* watchLoadRecommendedMovies() {
+  yield takeLatest(LOAD_RECOMMENDED_MOVIES_REQUEST, loadRecommendedMovies);
+}
 function* watchSearchMovie() {
   yield takeLatest(SEARCH_MOVIE_REQUEST, searchMovie);
 }
@@ -232,6 +257,7 @@ function* watchUpdateReview() {
 export default function* movieSaga() {
   yield all([
     fork(watchLoadRandomMovie),
+    fork(watchLoadRecommendedMovies),
     fork(watchSearchMovie),
     fork(watchLoadMovieDetail),
     fork(watchAddLike),

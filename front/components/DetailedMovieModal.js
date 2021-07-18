@@ -98,7 +98,7 @@ const DetailedMovieModal = ({ data, onCloseModal }) => {
   const likers = useSelector(state => state.movie.currentMovieDetail?.likers);
   const [showMoreActorModal, setShowMoreActorModal] = useState(false);
 
-  const liked = likers.find((v) => v.userIdx === userIdx);
+  const liked = likers?.find((v) => v.userIdx === userIdx);
 
   const onLike = useCallback((DOCID) => {
     if (!userIdx) {
