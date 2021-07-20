@@ -178,7 +178,7 @@ const Signup = () => {
       }
 
       axios.post('/auth/nickname', {
-        nickname,
+        nickname: nickname.trim(),
       }).then((result) => {
         setNicknamePassMsg(result.data);
       }).catch((error) => {
@@ -306,7 +306,7 @@ const Signup = () => {
 
     dispatch({
       type: SIGN_UP_REQUEST,
-      data: { email, password, nickname },
+      data: { email, password, nickname: nickname.trim() },
     });
   }, [email,
     emailAuthCode,

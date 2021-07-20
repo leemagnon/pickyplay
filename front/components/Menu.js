@@ -32,7 +32,7 @@ const Menu = ({ children, setShowUserMenu }) => {
 
 Menu.propTypes = {
   children: PropTypes.node.isRequired,
-  setShowUserMenu: PropTypes.bool.isRequired,
+  setShowUserMenu: PropTypes.func.isRequired,
 };
 
 export default Menu;

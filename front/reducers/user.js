@@ -21,6 +21,9 @@ export const initialState = {
   uploadProfileImgLoading: false, // 프로필 이미지 업로드 시도중
   uploadProfileImgDone: false,
   uploadProfileImgError: null,
+  updateUserProfileLoading: false, // 사용자 프로필 변경 시도중
+  updateUserProfileDone: false,
+  updateUserProfileError: null,
   updateUserEmailLoading: false, // 사용자 이메일 변경 시도중
   updateUserEmailDone: false,
   updateUserEmailError: null,
@@ -60,6 +63,8 @@ export const UPLOAD_PROFILE_IMAGE_FAILURE = 'UPLOAD_PROFILE_IMAGE_FAILURE';
 export const UPDATE_USER_PROFILE_REQUEST = 'UPDATE_USER_PROFILE_REQUEST';
 export const UPDATE_USER_PROFILE_SUCCESS = 'UPDATE_USER_PROFILE_SUCCESS';
 export const UPDATE_USER_PROFILE_FAILURE = 'UPDATE_USER_PROFILE_FAILURE';
+
+export const REMOVE_PROFILE_IMAGE = 'REMOVE_PROFILE_IMAGE';
 
 export const UPDATE_USER_EMAIL_REQUEST = 'UPDATE_USER_EMAIL_REQUEST';
 export const UPDATE_USER_EMAIL_SUCCESS = 'UPDATE_USER_EMAIL_SUCCESS';
@@ -162,6 +167,22 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case UPLOAD_PROFILE_IMAGE_FAILURE:
       draft.uploadProfileImgLoading = false;
       draft.uploadProfileImgError = action.error;
+      break;
+    case REMOVE_PROFILE_IMAGE:
+      draft.profileImgPath = '';
+      break;
+    case UPDATE_USER_PROFILE_REQUEST:
+      draft.updateUserProfileLoading = true;
+      draft.updateUserProfileDone = false;
+      draft.updateUserProfileError = null;
+      break;
+    case UPDATE_USER_PROFILE_SUCCESS:
+      draft.updateUserProfileLoading = false;
+      draft.updateUserProfileDone = true;
+      break;
+    case UPDATE_USER_PROFILE_FAILURE:
+      draft.updateUserProfileLoading = false;
+      draft.updateUserProfileError = action.error;
       break;
     case UPDATE_USER_EMAIL_REQUEST:
       draft.updateUserEmailLoading = true;

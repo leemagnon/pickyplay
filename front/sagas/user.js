@@ -19,6 +19,9 @@ import {
   UPLOAD_PROFILE_IMAGE_REQUEST,
   UPLOAD_PROFILE_IMAGE_SUCCESS,
   UPLOAD_PROFILE_IMAGE_FAILURE,
+  UPDATE_USER_PROFILE_REQUEST,
+  UPDATE_USER_PROFILE_SUCCESS,
+  UPDATE_USER_PROFILE_FAILURE,
   UPDATE_USER_EMAIL_REQUEST,
   UPDATE_USER_EMAIL_SUCCESS,
   UPDATE_USER_EMAIL_FAILURE,
@@ -124,12 +127,11 @@ function* signUp(action) {
 }
 
 function uploadProfileImageAPI(data) {
-  return axios.post('/user/newProfile', data);
+  return axios.post('/user/uploadProfileImg', data);
 }
 
 function* uploadProfileImage(action) {
   try {
-    console.log(action.data);
     const result = yield call(uploadProfileImageAPI, action.data);
     yield put({
       type: UPLOAD_PROFILE_IMAGE_SUCCESS,
@@ -138,6 +140,25 @@ function* uploadProfileImage(action) {
   } catch (err) {
     yield put({
       type: UPLOAD_PROFILE_IMAGE_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function updateUserProfileAPI(data) {
+  return axios.post('/user/newProfile', data);
+}
+
+function* updateUserProfile(action) {
+  try {
+    const result = yield call(updateUserProfileAPI, action.data);
+    yield put({
+      type: UPDATE_USER_PROFILE_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: UPDATE_USER_PROFILE_FAILURE,
       error: err.response.data,
     });
   }
@@ -200,6 +221,9 @@ function* watchSignUp() {
 function* watchUploadProfileImage() {
   yield takeLatest(UPLOAD_PROFILE_IMAGE_REQUEST, uploadProfileImage);
 }
+function* watchUpdateUserProfile() {
+  yield takeLatest(UPDATE_USER_PROFILE_REQUEST, updateUserProfile);
+}
 function* watchUpdateUserEmail() {
   yield takeLatest(UPDATE_USER_EMAIL_REQUEST, updateUserEmail);
 }
@@ -215,6 +239,7 @@ export default function* userSaga() {
     fork(watchLoadMyInfo),
     fork(watchSignUp),
     fork(watchUploadProfileImage),
+    fork(watchUpdateUserProfile),
     fork(watchUpdateUserEmail),
     fork(watchUpdateUserPassword),
   ]);

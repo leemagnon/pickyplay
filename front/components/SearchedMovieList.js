@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -8,6 +8,7 @@ import ReactTooltip from 'react-tooltip';
 import DetailedMovieModal from './DetailedMovieModal';
 import Modal from './Modal';
 import { LOAD_MOVIE_DETAIL_REQUEST } from '../reducers/movie';
+import AppContext from '../contexts/appContext';
 
 const PosterCards = styled.div`
     margin: 0 auto;
@@ -17,27 +18,21 @@ const PosterCards = styled.div`
     @media (min-width: 750px) {
         grid-template-columns: repeat(2, 1fr); 
     }
-
     @media (min-width: 1000px) {
         grid-template-columns: repeat(3, 1fr); 
     }
-
     @media (min-width: 1250px) {
         grid-template-columns: repeat(4, 1fr); 
     }
-
     @media (min-width: 1450px) {
         grid-template-columns: repeat(5, 1fr); 
     }
-
     @media (min-width: 1650px) {
         grid-template-columns: repeat(6, 1fr); 
     }
-
     @media (min-width: 1900px) {
         grid-template-columns: repeat(7, 1fr); 
     }
-
     @media (min-width: 2150px) {
         grid-template-columns: repeat(8, 1fr); 
     }
@@ -63,7 +58,7 @@ const SimpleInfo = styled.div`
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    width: 400px;
+    width: ${({ browserWidth }) => (browserWidth >= 410 ? 400 : 350)}px;
     color: white;
     padding: 1rem;
     border: 5px solid;
@@ -75,15 +70,11 @@ const SimpleInfo = styled.div`
     & b {
       font-size: 15px;
     }
-    & button {
-      &:hover {
-        background-color: red;
-      }
-    }
 `;
 
 const SearchedMovieList = ({ searchedMovies }) => {
   const dispatch = useDispatch();
+  const browserSize = useContext(AppContext);
   const { currentMovieDetail,
     loadMovieDetailDone,
     loadMovieDetailError } = useSelector((state) => state.movie);
@@ -141,7 +132,6 @@ const SearchedMovieList = ({ searchedMovies }) => {
 
         return (
           <div style={{ position: 'relative' }}>
-
             <PosterCard
               key={v._source.DOCID._cdata}
               src={v._source.posters._cdata}
@@ -152,11 +142,11 @@ const SearchedMovieList = ({ searchedMovies }) => {
             <SimpleInfo
               key={v._id}
               id={v._source.DOCID._cdata}
+              browserWidth={browserSize.browserWidth}
             >
               <div><b>키워드 :</b> {v._source.keywords._cdata}</div>
               <div><b>장르 :</b> {v._source.genre._cdata}</div>
               <div><b>배우 :</b> {actorStr}</div>
-
             </SimpleInfo>
 
             <div

@@ -20,7 +20,13 @@ class UserController implements Controller {
     this.router.get(`${this.path}/QRCodeUrl`, authMiddleware, this.getQRCodeUrl);
     this.router.post(`${this.path}/newEmail`, authMiddleware, this.updateEmail);
     this.router.post(`${this.path}/newPassword`, authMiddleware, this.updatePassword);
-    this.router.post(`${this.path}/newProfile`, authMiddleware, this.upload.single('image'), uploadProfileImg);
+    this.router.post(
+      `${this.path}/uploadProfileImg`,
+      authMiddleware,
+      this.upload.single('profileImg'),
+      uploadProfileImg,
+    );
+    this.router.post(`${this.path}/newProfile`, this.upload.none(), authMiddleware, this.updateProfile);
     this.router.patch(`${this.path}/Disable2FA`, authMiddleware, this.disable2FA);
   }
 
@@ -57,6 +63,16 @@ class UserController implements Controller {
   private updatePassword = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       await this.userService.updateUserPassword(req);
+      res.status(200).send('ok');
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private updateProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      await this.userService.updateProfile(req);
       res.status(200).send('ok');
     } catch (error) {
       console.error(error);

@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
+import { Button } from 'antd';
 import gravatar from 'gravatar';
 import axios from 'axios';
-import { UPDATE_USER_PROFILE_REQUEST, UPLOAD_PROFILE_IMAGE_REQUEST } from '../reducers/user';
+import { UPDATE_USER_PROFILE_REQUEST, UPLOAD_PROFILE_IMAGE_REQUEST, REMOVE_PROFILE_IMAGE } from '../reducers/user';
 import { nicknameRule } from '../util/regexp';
 
 /** css */
@@ -63,7 +64,9 @@ const UpdateProfile = () => {
   const { me,
     profileImgPath,
     uploadProfileImgError,
-    uploadProfileImgDone } = useSelector((state) => state.user);
+    uploadProfileImgDone,
+    updateUserProfileDone,
+  } = useSelector((state) => state.user);
   const imageInput = useRef();
   const [nickname, setNickname] = useState(me.nickname);
   const [nicknameValidationError, setNicknameValidationError] = useState(false);
@@ -81,6 +84,13 @@ const UpdateProfile = () => {
       router.replace('/');
     }
   }, [me]);
+
+  useEffect(() => {
+    if (updateUserProfileDone) {
+      alert('프로필 변경 완료.');
+      router.replace('/');
+    }
+  }, [updateUserProfileDone]);
 
   useEffect(() => {
     if (uploadProfileImgError) {
@@ -116,7 +126,7 @@ const UpdateProfile = () => {
       }
 
       axios.post('/auth/nickname', {
-        nickname,
+        nickname: nickname.trim(),
       }).then((result) => {
         setNicknamePassMsg(result.data);
       }).catch((error) => {
@@ -151,7 +161,7 @@ const UpdateProfile = () => {
 
   const onChangeImages = useCallback((e) => {
     const imageFormData = new FormData();
-    imageFormData.append('image', e.target.files[0]);
+    imageFormData.append('profileImg', e.target.files[0]);
     dispatch({
       type: UPLOAD_PROFILE_IMAGE_REQUEST,
       data: imageFormData,
@@ -159,6 +169,12 @@ const UpdateProfile = () => {
   }, []);
 
   const onSubmit = useCallback(() => {
+    const formData = new FormData();
+
+    if ((!profileImgPath && !nickname) || (!profileImgPath && nickname === me.nickname)) {
+      return alert('프로필 이미지 또는 닉네임을 변경해주세요.');
+    }
+
     if (nickname !== '') {
       if (duplicatedNicknameCheckRequiredError || nicknamePassMsg === '') {
         setNicknameValidationError(false);
@@ -169,13 +185,17 @@ const UpdateProfile = () => {
         setDuplicatedNicknameCheckRequiredError(false);
         return setNicknameValidationError(true);
       }
+
+      formData.append('nickname', nickname.trim());
     }
 
-    console.log(nickname, profileImgPath);
+    if (profileImgPath) {
+      formData.append('profileImgUrl', profileImgPath);
+    }
 
-    dispatch({
+    return dispatch({
       type: UPDATE_USER_PROFILE_REQUEST,
-      data: { nickname, profileImgPath },
+      data: formData,
     });
   }, [nickname, nicknamePassMsg, duplicatedNicknameCheckRequiredError,
     profileImgPath,
@@ -185,14 +205,27 @@ const UpdateProfile = () => {
     router.back();
   }, []);
 
+  const onRemoveImage = useCallback(() => {
+    dispatch({
+      type: REMOVE_PROFILE_IMAGE,
+    });
+  }, []);
+
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column' }}>
       <Title>프로필 변경</Title>
       <Contents style={{ textAlign: 'center' }}>
-        <ProfileImg src={profileImgPath || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} onClick={onClickImageUpload} />
+        <div>
+          <div key={profileImgPath} style={{ display: 'inline-block' }}>
+            <ProfileImg src={me.profileImgUrl || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} onClick={onClickImageUpload} />
+            <div>
+              <Button onClick={onRemoveImage}>제거</Button>
+            </div>
+          </div>
+        </div>
         <br /><br />
         <form id="nicknameForm" encType="multipart/form-data" onSubmit="return false">
-          <input type="file" name="image" hidden ref={imageInput} onChange={onChangeImages} />
+          <input type="file" name="profileImg" hidden ref={imageInput} onChange={onChangeImages} />
           <div>
             <input type="text" name="nickname" className={`${NicknameInput} ${nicknamePassMsg ? 'pass' : ''}`} value={nickname} placeholder="닉네임 입력" onChange={onChangeNickname} />
             <button

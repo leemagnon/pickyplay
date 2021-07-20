@@ -103,7 +103,14 @@ class SearchController implements Controller {
 
       // 첫번째 도큐먼트의 stll url string 배열로 만들어준 후 응답.
       result[0]._source.DOCID._cdata = result[0]._source.DOCID._cdata.trim();
+      result[0]._source.title._cdata = result[0]._source.title._cdata.trim();
       result[0]._source.stlls._cdata = result[0]._source.stlls._cdata.trim().split('|');
+
+      if (!Object.prototype.hasOwnProperty.call(result[0]._source.plots.plot, 'plotText')) {
+        result[0]._source.plots._cdata = result[0]._source.plots.plot[0].plotText._cdata.trim();
+      } else {
+        result[0]._source.plots._cdata = result[0]._source.plots.plot.plotText._cdata.trim();
+      }
 
       res.status(200).json(result[0]);
     } catch (error) {
@@ -197,17 +204,29 @@ class SearchController implements Controller {
         };
 
         let result = await this.client.search(params1);
+        const _id = result.hits.hits[0]._id;
         result = result.hits.hits[0]._source;
         top10Movies.push(result);
 
+        result._id = _id;
         result.posters = result.posters._cdata.trim().split('|')[0];
         result.DOCID = result.DOCID._cdata.trim();
         result.title = result.title._cdata.trim();
-        result.keywords = result.keywords._cdata.trim();
         result.genre = result.genre._cdata.trim();
 
         /**
-         * actors(출연배우) 배열 생성
+         * keywords(출연배우) 문자열 생성
+         */
+        const keywordArr = result.keywords._cdata.trim().split(',');
+
+        if (keywordArr.length > 5) {
+          result.keywords = `${keywordArr[0]}, ${keywordArr[1]}, ${keywordArr[2]}, ${keywordArr[3]}, ${keywordArr[4]}`;
+        } else {
+          result.keywords = keywordArr.toString();
+        }
+
+        /**
+         * actors(출연배우) 문자열 생성
          */
         const actorArr = [];
         if (!Object.prototype.hasOwnProperty.call(result.actors.actor, 'actorNm')) {
@@ -217,7 +236,12 @@ class SearchController implements Controller {
         } else {
           actorArr.push(result.actors.actor.actorNm._cdata.trim());
         }
-        result.actors = actorArr;
+
+        if (actorArr.length > 5) {
+          result.actors = `${actorArr[0]}, ${actorArr[1]}, ${actorArr[2]}`;
+        } else {
+          result.actors = actorArr.toString();
+        }
       }
 
       /** 2. 랜덤 장르 [코메디, 멜로드라마, 범죄, 스릴러, 역사, SF, 스포츠, 액션, 어드벤처, 판타지, 청춘영화, 가족] 중 영화 20개 추천 */
@@ -229,8 +253,18 @@ class SearchController implements Controller {
         doc._source.posters = doc._source.posters._cdata.trim().split('|')[0];
         doc._source.DOCID = doc._source.DOCID._cdata.trim();
         doc._source.title = doc._source.title._cdata.trim();
-        doc._source.keywords = doc._source.keywords._cdata.trim();
         doc._source.genre = doc._source.genre._cdata.trim();
+
+        /**
+         * keywords(출연배우) 문자열 생성
+         */
+        const keywordArr = doc._source.keywords._cdata.trim().split(',');
+
+        if (keywordArr.length > 5) {
+          doc._source.keywords = `${keywordArr[0]}, ${keywordArr[1]}, ${keywordArr[2]}, ${keywordArr[3]}, ${keywordArr[4]}`;
+        } else {
+          doc._source.keywords = keywordArr.toString();
+        }
 
         /**
          * actors(출연배우) 배열 생성
@@ -243,7 +277,12 @@ class SearchController implements Controller {
         } else {
           actorArr.push(doc._source.actors.actor.actorNm._cdata.trim());
         }
-        doc._source.actors = actorArr;
+
+        if (actorArr.length > 5) {
+          doc._source.actors = `${actorArr[0]}, ${actorArr[1]}, ${actorArr[2]}`;
+        } else {
+          doc._source.actors = actorArr.toString();
+        }
       }
 
       res.status(200).json({ top10Movies, randomMovies: result, randomGenre });

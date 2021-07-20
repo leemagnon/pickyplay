@@ -6,6 +6,8 @@ import AppLayout from '../components/AppLayout';
 import wrapper from '../store/configureStore';
 import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import { LOAD_RANDOM_MOVIE_REQUEST, LOAD_RECOMMENDED_MOVIES_REQUEST } from '../reducers/movie';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 // 프론트랑 브라우저 둘 다에서 실행됨.
 const Home = () => (

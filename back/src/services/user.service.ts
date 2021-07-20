@@ -77,6 +77,28 @@ class UserService {
       { where: { userIdx: req.user.userIdx }, individualHooks: true },
     );
   }
+
+  public async updateProfile(req: RequestWithUser) {
+    const { nickname, profileImgUrl } = req.body;
+
+    if (nickname) {
+      await this.user.update(
+        {
+          nickname,
+        },
+        { where: { userIdx: req.user.userIdx }, individualHooks: true },
+      );
+    }
+
+    if (profileImgUrl) {
+      await this.user.update(
+        {
+          profileImgUrl,
+        },
+        { where: { userIdx: req.user.userIdx }, individualHooks: true },
+      );
+    }
+  }
 }
 
 export default UserService;

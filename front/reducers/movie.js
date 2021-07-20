@@ -4,6 +4,8 @@ export const initialState = {
   randomMovie: {
     DOCID: '',
     stlls: [],
+    title: '',
+    plots: '',
   },
   recommendedMovies: {
     top10Movies: [],
@@ -96,6 +98,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.randomMovie = {
         DOCID: action.data._source.DOCID._cdata,
         stlls: action.data._source.stlls._cdata,
+        title: action.data._source.title._cdata,
+        plots: action.data._source.plots._cdata,
       };
       break;
     case LOAD_RANDOM_MOVIE_FAILURE:
