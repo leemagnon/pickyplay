@@ -73,7 +73,9 @@ class AuthenticationService {
   public async loggingIn(logInData: LogInDto) {
     const user = await this.user.findOne({ where: { email: logInData.email } });
     if (user) {
+      console.log(logInData.password, user.password);
       const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
+      console.log('isPasswordMatching : ', isPasswordMatching);
       if (isPasswordMatching) {
         const result = !user.twoFactorAuthenticationCode ? user : 'Activate 2FA';
         return result;

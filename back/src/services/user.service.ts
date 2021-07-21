@@ -86,7 +86,7 @@ class UserService {
         {
           nickname,
         },
-        { where: { userIdx: req.user.userIdx }, individualHooks: true },
+        { where: { userIdx: req.user.userIdx } },
       );
     }
 
@@ -95,7 +95,7 @@ class UserService {
         {
           profileImgUrl,
         },
-        { where: { userIdx: req.user.userIdx }, individualHooks: true },
+        { where: { userIdx: req.user.userIdx } },
       );
     }
   }

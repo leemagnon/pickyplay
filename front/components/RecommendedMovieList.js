@@ -1,9 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import Slider from 'react-slick';
 import styled from 'styled-components';
-import AppContext from '../contexts/appContext';
+import ReactTooltip from 'react-tooltip';
+import { LOAD_MOVIE_DETAIL_REQUEST } from '../reducers/movie';
 
 const PosterCards = styled.div`
     margin: 0 auto;
@@ -35,47 +37,27 @@ const PosterCard = styled.img`
     text-align: center;
     background-blend-mode: multiply;
     background-color: dodgerblue;
-`;
-
-const SimpleInfo = styled.div`
-    display: none;
-    z-index: 1;
-    background-color: rgb(0,0,0,0.7);
-    position: absolute;
-    float: left;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 100%;
-    height: 100%;
-    color: white;
-    padding: 1rem;
-    border: 5px solid;
-    border-image-slice: 1;
-    border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
-    & div {
-      margin-bottom: 10px;
-    }
-    & b {
-      font-size: 15px;
-    }
-    & button {
-      width: 70px;
-      margin: auto;
-      background-color: #c73bbd;
-      border-width: 3px;
-      border-color: #7d217d;
-      border-radius: 3px;
-      &:hover {
-        background-color: purple;
-      }
+    cursor: pointer;
+    &:hover {
+      filter: brightness(0.8);
     }
 `;
 
 const RecommendedMovieList = ({ recommendedMovies }) => {
-  const browserSize = useContext(AppContext);
+  const dispatch = useDispatch();
   const [recommendedMoviesHover, setRecommendedMoviesHover] = useState(false);
   const [randomMoviesHover, setRandomMoviesHover] = useState(false);
+
+  const [isTooltipVisible, setTooltipVisibility] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    setTooltipVisibility(true);
+  }, []);
 
   const recommendedMoviesSettings = { // slider1 세팅
     arrows: recommendedMoviesHover,
@@ -84,7 +66,7 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
     slidesToScroll: 5,
     autoplay: false,
     speed: 800,
-    responsive: [
+    responsive: isClient ? [
       {
         breakpoint: 950,
         settings: {
@@ -112,7 +94,7 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
           dots: recommendedMoviesHover,
         },
       },
-    ],
+    ] : null,
   };
 
   const randomMoviesSettings = { // slider2 세팅
@@ -122,7 +104,7 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
     slidesToScroll: 5,
     autoplay: false,
     speed: 800,
-    responsive: [
+    responsive: isClient ? [
       {
         breakpoint: 950,
         settings: {
@@ -150,7 +132,7 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
           dots: randomMoviesHover,
         },
       },
-    ],
+    ] : null,
   };
 
   const recommendedMoviesReference = useRef();
@@ -172,13 +154,11 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
     });
   }, []);
 
-  const toggleSimpleInfo = useCallback((DOCID, show = false) => {
-    if (show) {
-      document.getElementById(DOCID).style.display = 'flex';
-      document.getElementById(DOCID).style.flexDirection = 'column';
-    } else {
-      document.getElementById(DOCID).style.display = 'none';
-    }
+  const toggleMovieDetail = useCallback((DOCID) => {
+    dispatch({
+      type: LOAD_MOVIE_DETAIL_REQUEST,
+      data: DOCID.trim(),
+    });
   }, []);
 
   return (
@@ -186,30 +166,18 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
       <PosterCards>
         <label style={{ color: 'white', fontSize: '30px', marginLeft: '10px' }}>오늘 PICKYPLAY의 TOP 10 콘텐츠</label>
         <div ref={recommendedMoviesReference} style={{ marginTop: '10px' }}>
-          <Slider {...recommendedMoviesSettings}>
+          <Slider key={isClient ? 'client' : 'server'} {...recommendedMoviesSettings}>
             {recommendedMovies
               .top10Movies
               .map((v) => (
-                <div key={`${v.title}-wrapper`}>
-                  <PosterCard
-                    key={v.title}
-                    src={v.posters}
-                    onError={(e) => { e.target.style.backgroundcolor = 'dodgerblue'; }}
-                    onMouseOverCapture={() => toggleSimpleInfo(v.DOCID, true)}
-                    alt={v.title}
-                  />
-                  <SimpleInfo
-                    key={v._id}
-                    id={v.DOCID}
-                    onMouseOutCapture={() => toggleSimpleInfo(v.DOCID)}
-                    // onMouseOutCapture={() => console.log(`${v.DOCID} 아웃`)}
-                  >
-                    <div><b>키워드 :</b> {v.keywords}</div>
-                    <div><b>장르 :</b> {v.genre}</div>
-                    <div><b>배우 :</b> {v.actors}</div>
-                    <div style={{ display: 'flex' }}><button type="button">상세보기</button></div>
-                  </SimpleInfo>
-                </div>
+                <PosterCard
+                  key={v._id}
+                  src={v.posters}
+                  onError={(e) => { e.target.style.backgroundcolor = 'dodgerblue'; }}
+                  onClick={() => toggleMovieDetail(v.DOCID)}
+                  alt={v.title}
+                  data-tip="상세보기"
+                />
               ))}
           </Slider>
         </div>
@@ -217,20 +185,23 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
       <PosterCards>
         <label style={{ color: 'white', fontSize: '30px', marginLeft: '10px' }}>추천 콘텐츠 ( {recommendedMovies.randomGenre} )</label>
         <div ref={randomMoviesReference} style={{ marginTop: '10px' }}>
-          <Slider {...randomMoviesSettings}>
+          <Slider key={isClient ? 'client' : 'server'} {...randomMoviesSettings}>
             {recommendedMovies
               .randomMovies
               .map((v) => (
                 <PosterCard
-                  key={v._source.DOCID}
+                  key={v._id}
                   src={v._source.posters}
                   onError={(e) => { e.target.style.backgroundcolor = 'dodgerblue'; }}
+                  onClick={() => toggleMovieDetail(v._source.DOCID)}
                   alt={v._source.title}
+                  data-tip="상세보기"
                 />
               ))}
           </Slider>
         </div>
       </PosterCards>
+      {isTooltipVisible && <ReactTooltip place="top" type="dark" effect="float" />}
     </div>
   );
 };

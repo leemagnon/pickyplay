@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useCallback, useState, useRef, useEffect, useContext } from 'react';
+import React, { useCallback, useState, useEffect, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -77,9 +77,10 @@ const SearchedMovieList = ({ searchedMovies }) => {
   const browserSize = useContext(AppContext);
   const { currentMovieDetail,
     loadMovieDetailDone,
-    loadMovieDetailError } = useSelector((state) => state.movie);
+    loadMovieDetailError,
+  } = useSelector((state) => state.movie);
   const [showMovieDetail, setShowMovieDetail] = useState({ show: false, data: {} });
-  const docReference = useRef();
+  const [isTooltipVisible, setTooltipVisibility] = useState(false);
 
   useEffect(() => {
     if (loadMovieDetailError) {
@@ -93,11 +94,21 @@ const SearchedMovieList = ({ searchedMovies }) => {
     }
   }, [loadMovieDetailDone && currentMovieDetail]);
 
-  const toggleSimpleInfo = useCallback((DOCID, show = false) => {
+  const toggleSimpleInfo = useCallback((DOCID, _id, show = false) => {
     if (show) {
+      // tooltip
+      setTooltipVisibility(true);
+      // PosterCard
+      document.getElementById(_id).style.filter = 'brightness(0.8)';
+      // SimpleInfo
       document.getElementById(DOCID).style.display = 'flex';
       document.getElementById(DOCID).style.flexDirection = 'column';
     } else {
+      // tooltip
+      setTooltipVisibility(false);
+      // PosterCard
+      document.getElementById(_id).style.filter = 'none';
+      // SimpleInfo
       document.getElementById(DOCID).style.display = 'none';
     }
   }, []);
@@ -131,16 +142,17 @@ const SearchedMovieList = ({ searchedMovies }) => {
         }
 
         return (
-          <div style={{ position: 'relative' }}>
+          <div key={v._id} style={{ position: 'relative' }}>
             <PosterCard
-              key={v._source.DOCID._cdata}
+              id={v._id}
+              // key={v._source.DOCID._cdata}
               src={v._source.posters._cdata}
               onError={(e) => { e.target.style.backgroundcolor = 'dodgerblue'; }}
               alt={v._source.title._cdata.trim()}
             />
 
             <SimpleInfo
-              key={v._id}
+              // key={v._id}
               id={v._source.DOCID._cdata}
               browserWidth={browserSize.browserWidth}
             >
@@ -159,18 +171,15 @@ const SearchedMovieList = ({ searchedMovies }) => {
                 height: '100%',
                 cursor: 'pointer',
               }}
-              key={v._source.DOCID._cdata.trim()}
-              id={v._id}
-              ref={docReference}
-              onMouseOverCapture={() => toggleSimpleInfo(v._source.DOCID._cdata, true)}
-              onMouseOutCapture={() => toggleSimpleInfo(v._source.DOCID._cdata)}
+              onMouseOverCapture={() => toggleSimpleInfo(v._source.DOCID._cdata, v._id, true)}
+              onMouseOutCapture={() => toggleSimpleInfo(v._source.DOCID._cdata, v._id)}
               onClick={() => toggleMovieDetail(v._source.DOCID._cdata)}
               data-tip="상세보기"
             />
-            <ReactTooltip place="top" type="dark" effect="float" />
           </div>
         );
       })}
+      {isTooltipVisible && <ReactTooltip place="top" type="dark" effect="float" />}
       <Modal visible={showMovieDetail.show}>
         <DetailedMovieModal
           data={showMovieDetail.data}
@@ -178,7 +187,6 @@ const SearchedMovieList = ({ searchedMovies }) => {
         />
       </Modal>
     </PosterCards>
-
   );
 };
 

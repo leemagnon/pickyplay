@@ -51,7 +51,7 @@ const ReviewCard = ({ reviews }) => {
   return (
     <div>
       {reviews.map((v) => (
-        <div style={{ marginBottom: 20 }}>
+        <div key={v.reviewIdx} style={{ marginBottom: 20 }}>
           <Card
             cover={v.images[0] && <ReviewImages images={v.images} />}
             extra={userIdx && userIdx === v.user.userIdx && (

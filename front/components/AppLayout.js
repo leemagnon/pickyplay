@@ -310,14 +310,12 @@ const AppLayout = () => {
       <Global />
       <Wrapper1>
         <Header>
-          <Link href="/">
-            <Logo className="font-carter-one">
-              <span>P</span>
-              ICKY
-              <span>P</span>
-              LAY
-            </Logo>
-          </Link>
+          <Logo className="font-carter-one" href="/">
+            <span>P</span>
+            ICKY
+            <span>P</span>
+            LAY
+          </Logo>
 
           <div id="search_box">
             <button

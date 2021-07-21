@@ -76,6 +76,7 @@ const UpdateProfile = () => {
   ] = useState(false);
   const [nicknamePassMsg, setNicknamePassMsg] = useState(false);
   const [nicknameFailMsg, setNicknameFailMsg] = useState('');
+  const [previewImg, setPreviewImg] = useState(me.profileImgUrl);
 
   const NicknameInput = nicknameValidationError || duplicatedNicknameCheckRequiredError || nicknameFailMsg !== '' ? 'error' : null;
 
@@ -101,8 +102,9 @@ const UpdateProfile = () => {
   useEffect(() => {
     if (uploadProfileImgDone) {
       alert('이미지 업로드 완료.');
+      setPreviewImg(profileImgPath);
     }
-  }, [uploadProfileImgDone]);
+  }, [uploadProfileImgDone, profileImgPath]);
 
   useEffect(() => {
     if (nicknameFailMsg !== '') { // 닉네임 중복 등의 에러 발생 시 alert 띄우기
@@ -217,7 +219,7 @@ const UpdateProfile = () => {
       <Contents style={{ textAlign: 'center' }}>
         <div>
           <div key={profileImgPath} style={{ display: 'inline-block' }}>
-            <ProfileImg src={me.profileImgUrl || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} onClick={onClickImageUpload} />
+            <ProfileImg src={previewImg || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} onClick={onClickImageUpload} />
             <div>
               <Button onClick={onRemoveImage}>제거</Button>
             </div>

@@ -4,6 +4,19 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
 /** css */
+const Logo = styled.a`
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  margin-left: 65px;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  font-size: 35px;
+  color: white;
+  & span {
+    color: #9400d3;
+  }
+`;
+
 const Title = styled.p`
   flex: 1;
   display: flex;
@@ -62,6 +75,12 @@ const Intro = () => {
 
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden', flexDirection: 'column', backgroundColor: '#1d2327' }}>
+      <Logo className="font-carter-one" href="/">
+        <span>P</span>
+        ICKY
+        <span>P</span>
+        LAY
+      </Logo>
       <Title>😊 회원 정보 수정</Title>
       <Container>
         {me && !me.is2FAOn ? (
