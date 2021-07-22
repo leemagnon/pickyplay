@@ -195,7 +195,7 @@ const AppLayout = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const browserSize = useContext(AppContext);
-  const { me, myMovies } = useSelector((state) => state.user);
+  const { me } = useSelector((state) => state.user);
   const { randomMovie, recommendedMovies, searchedMovies, currentMovieDetail, loadRandomMovieDone, loadMovieDetailDone, loadMovieDetailError } = useSelector((state) => state.movie);
   const [isHome, setIsHome] = useState(true);
   const [width, setWidth] = useState(0);
@@ -350,7 +350,7 @@ const AppLayout = () => {
 
           {me ? (
             <>
-              <div onMouseEnter={toggleUserProfile}>
+              <div onMouseEnter={toggleUserProfile} onClick={toggleUserProfile}>
                 <ProfileImg src={me.profileImgUrl || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} />
               </div>
               {showUserMenu && (
