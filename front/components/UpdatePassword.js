@@ -133,8 +133,6 @@ const UpdatePassword = () => {
       }
     }
 
-    console.log(password, passwordCheck);
-
     dispatch({
       type: UPDATE_USER_PASSWORD_REQUEST,
       data: { password },

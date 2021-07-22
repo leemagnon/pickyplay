@@ -151,8 +151,6 @@ const UpdateEmail = () => {
       return setUserEmailAuthCodeValidationError(true);
     }
 
-    console.log(email, userEmailAuthCode);
-
     dispatch({
       type: UPDATE_USER_EMAIL_REQUEST,
       data: { email },

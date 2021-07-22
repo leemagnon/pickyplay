@@ -33,7 +33,6 @@ export const S3Upload = (folder) =>
 
 export const uploadProfileImg = async (req, res, next) => {
   try {
-    console.log(req.file);
     res.json(req.file.location);
   } catch (error) {
     console.error(error);
@@ -43,7 +42,6 @@ export const uploadProfileImg = async (req, res, next) => {
 
 export const uploadReviewImgs = async (req, res, next) => {
   try {
-    console.log(req.files);
     res.json(req.files.map((v) => v.location));
   } catch (error) {
     console.error(error);

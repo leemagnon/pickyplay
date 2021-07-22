@@ -209,7 +209,6 @@ class SearchController implements Controller {
         let result = await this.client.search(params1);
         const _id = result.hits.hits[0]._id;
         result = result.hits.hits[0]._source;
-        top10Movies.push(result); //  이 부분 내일 수정??
 
         result._id = _id;
         result.posters = result.posters._cdata.trim().split('|')[0];
@@ -245,6 +244,8 @@ class SearchController implements Controller {
         } else {
           result.actors = actorArr.toString();
         }
+
+        top10Movies.push(result);
       }
 
       /** 2. 랜덤 장르 [코메디, 멜로드라마, 범죄, 스릴러, 역사, SF, 스포츠, 액션, 어드벤처, 판타지, 청춘영화, 가족] 중 영화 20개 추천 */

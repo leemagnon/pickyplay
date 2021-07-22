@@ -302,8 +302,6 @@ const Signup = () => {
       return setPasswordCheckError(true);
     }
 
-    console.log(email, userEmailAuthCode, password, passwordCheck, nickname);
-
     dispatch({
       type: SIGN_UP_REQUEST,
       data: { email, password, nickname: nickname.trim() },

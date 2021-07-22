@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import gravatar from 'gravatar';
 import styled, { createGlobalStyle } from 'styled-components';
 import Menu from './Menu';

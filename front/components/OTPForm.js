@@ -71,8 +71,6 @@ const OTPForm = ({ email, onCloseModal }) => {
   const onSubmit = useCallback((e) => {
     e.preventDefault();
 
-    console.log(twoFactorAuthenticationCode, email);
-
     dispatch({
       type: SECOND_AUTH_REQUEST,
       data: { twoFactorAuthenticationCode, email },
