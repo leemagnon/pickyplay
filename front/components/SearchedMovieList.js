@@ -120,12 +120,19 @@ const SearchedMovieList = ({ searchedMovies }) => {
     });
   }, []);
 
+  if (searchedMovies.length === 0) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', color: 'white' }}>
+        검색 결과가 없습니다.
+      </div>
+    );
+  }
   return (
     <PosterCards>
       {searchedMovies.map((v) => {
         /**
-         * actor 문자열 생성
-         */
+           * actor 문자열 생성
+           */
         let actorStr = '';
         const arr = [];
         if (!Object.prototype.hasOwnProperty.call(v._source.actors.actor, 'actorNm')) { // v._source.actors.actor 에 actorNm 이 없으면 v._source.actors.actor는 배열.
@@ -145,14 +152,14 @@ const SearchedMovieList = ({ searchedMovies }) => {
           <div key={v._id} style={{ position: 'relative' }}>
             <PosterCard
               id={v._id}
-              // key={v._source.DOCID._cdata}
+                // key={v._source.DOCID._cdata}
               src={v._source.posters._cdata}
               onError={(e) => { e.target.style.backgroundcolor = 'dodgerblue'; }}
               alt={v._source.title._cdata.trim()}
             />
 
             <SimpleInfo
-              // key={v._id}
+                // key={v._id}
               id={v._source.DOCID._cdata}
               browserWidth={browserSize.browserWidth}
             >

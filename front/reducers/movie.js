@@ -15,6 +15,10 @@ export const initialState = {
   searchedMovies: [],
   currentMovieDetail: null,
   reviewImgPaths: [], // 미리보기용
+  myMovies: null,
+  loadMyMoviesLoading: false, // 사용자가 좋아요 누른 영화 가져오기 시도중
+  loadMyMoviesDone: false,
+  loadMyMoviesError: null,
   loadRandomMovieLoading: false, // 랜덤 스틸컷 로딩 중
   loadRandomMovieDone: false,
   loadRandomMovieError: null,
@@ -56,6 +60,10 @@ export const SEARCH_MOVIE_FAILURE = 'SEARCH_MOVIE_FAILURE';
 export const LOAD_MOVIE_DETAIL_REQUEST = 'LOAD_MOVIE_DETAIL_REQUEST';
 export const LOAD_MOVIE_DETAIL_SUCCESS = 'LOAD_MOVIE_DETAIL_SUCCESS';
 export const LOAD_MOVIE_DETAIL_FAILURE = 'LOAD_MOVIE_DETAIL_FAILURE';
+
+export const LOAD_MY_MOVIES_REQUEST = 'LOAD_MY_MOVIES_REQUEST';
+export const LOAD_MY_MOVIES_SUCCESS = 'LOAD_MY_MOVIES_SUCCESS';
+export const LOAD_MY_MOVIES_FAILURE = 'LOAD_MY_MOVIES_FAILURE';
 
 export const ADD_LIKE_REQUEST = 'ADD_LIKE_REQUEST';
 export const ADD_LIKE_SUCCESS = 'ADD_LIKE_SUCCESS';
@@ -153,6 +161,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.loadMovieDetailLoading = false;
       draft.loadMovieDetailError = action.error;
       break;
+    case LOAD_MY_MOVIES_REQUEST:
+      draft.loadMyMoviesLoading = true;
+      draft.loadMyMoviesError = null;
+      draft.loadMyMoviesDone = false;
+      break;
+    case LOAD_MY_MOVIES_SUCCESS:
+      draft.loadMyMoviesLoading = false;
+      draft.loadMyMoviesDone = true;
+      draft.myMovies = action.data;
+      break;
+    case LOAD_MY_MOVIES_FAILURE:
+      draft.loadMyMoviesLoading = false;
+      draft.loadMyMoviesError = action.error;
+      break;
     case ADD_LIKE_REQUEST:
       draft.addLikeLoading = true;
       draft.addLikeDone = false;
@@ -162,6 +184,9 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.addLikeLoading = false;
       draft.addLikeDone = true;
       draft.currentMovieDetail.likers.push({ userIdx: action.data.userIdx });
+      if (draft.myMovies) {
+        draft.myMovies.push(action.data.likedMovie);
+      }
       break;
     case ADD_LIKE_FAILURE:
       draft.addLikeLoading = false;
@@ -177,6 +202,9 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.removeLikeDone = true;
       draft.currentMovieDetail.likers = draft.currentMovieDetail.likers
         .filter((v) => v.userIdx !== action.data.userIdx);
+      if (draft.myMovies) {
+        draft.myMovies = draft.myMovies.filter((v) => v.DOCID !== action.data.DOCID);
+      }
       break;
     case REMOVE_LIKE_FAILURE:
       draft.removeLikeLoading = false;

@@ -21,14 +21,6 @@ async function authMiddleware(req: RequestWithUser, res: Response, next: NextFun
         attributes: {
           exclude: ['password', 'twoFactorAuthenticationCode'],
         },
-        include: [
-          {
-            model: likeModel,
-          },
-          {
-            model: reviewModel,
-          },
-        ],
       });
       if (user) {
         req.user = user; // 로그인한 사람은 req 객체에 user 정보를 가지고 있는다.

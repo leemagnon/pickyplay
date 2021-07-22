@@ -1,4 +1,5 @@
 import userModel from 'src/models/user.model';
+import likeModel from 'src/models/like.model';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import User from 'src/interfaces/user.interface';
@@ -52,6 +53,7 @@ class UserService {
     );
   }
 
+  /* 회원 정보 수정 */
   public async updateUserEmail(req: RequestWithUser) {
     const newEmail: string = req.body.email;
     const exUser = await this.user.findOne({ where: { email: newEmail } });

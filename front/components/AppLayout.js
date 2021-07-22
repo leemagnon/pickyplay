@@ -193,7 +193,7 @@ const AppLayout = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const browserSize = useContext(AppContext);
-  const { me } = useSelector((state) => state.user);
+  const { me, myMovies } = useSelector((state) => state.user);
   const { randomMovie, recommendedMovies, searchedMovies, currentMovieDetail, loadRandomMovieDone, loadMovieDetailDone, loadMovieDetailError } = useSelector((state) => state.movie);
   const [isHome, setIsHome] = useState(true);
   const [width, setWidth] = useState(0);
@@ -274,16 +274,16 @@ const AppLayout = () => {
   const onChangeText = useCallback((e) => {
     if (e.target.value !== '') {
       setIsHome(false);
+      dispatch({
+        type: REMOVE_CURRENT_MOVIE
+      })
+      dispatch({
+        type: SEARCH_MOVIE_REQUEST,
+        data: e.target.value,
+      });
     } else {
       setIsHome(true);
     }
-    dispatch({
-      type: REMOVE_CURRENT_MOVIE
-    })
-    dispatch({
-      type: SEARCH_MOVIE_REQUEST,
-      data: e.target.value,
-    });
   }, []);
 
     const toggleUserProfile = useCallback(() => {
@@ -303,6 +303,13 @@ const AppLayout = () => {
       type: LOAD_MOVIE_DETAIL_REQUEST,
       data: DOCID,
     });
+  }, []);
+
+  const goToMyMovies = useCallback(() => {
+    dispatch({
+      type: REMOVE_CURRENT_MOVIE
+    })
+    return router.replace('/MyMovies');
   }, []);
 
   return (
@@ -350,7 +357,7 @@ const AppLayout = () => {
                     <img src={me.profileImgUrl || gravatar.url(me.email, { s: '38px', d: 'retro' })} alt={me.nickname} style={{borderRadius: '5px', width: '38px', height: '38px'}} />
                     <div id="profile-name">{me.nickname}</div> 
                   </ProfileModal>
-                  <MenuButton onClick={() => router.replace('/MyMovies')}>무비컬렉션</MenuButton>
+                  <MenuButton onClick={goToMyMovies}>무비컬렉션</MenuButton>
                   <MenuButton onClick={() => router.replace('/UpdateUserInfo')}>회원정보수정</MenuButton>
                   <MenuButton onClick={onLogOut}>로그아웃</MenuButton>
                 </Menu>

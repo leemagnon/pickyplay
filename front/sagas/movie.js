@@ -13,6 +13,9 @@ import {
   LOAD_MOVIE_DETAIL_REQUEST,
   LOAD_MOVIE_DETAIL_SUCCESS,
   LOAD_MOVIE_DETAIL_FAILURE,
+  LOAD_MY_MOVIES_REQUEST,
+  LOAD_MY_MOVIES_SUCCESS,
+  LOAD_MY_MOVIES_FAILURE,
   ADD_LIKE_REQUEST,
   ADD_LIKE_SUCCESS,
   ADD_LIKE_FAILURE,
@@ -105,6 +108,26 @@ function* loadMovieDetail(action) {
     yield put({
       type: LOAD_MOVIE_DETAIL_FAILURE,
       error: error.response.data,
+    });
+  }
+}
+
+function loadMyMoviesAPI() {
+  return axios.get('/search/myMovies');
+}
+
+function* loadMyMovies() {
+  try {
+    const result = yield call(loadMyMoviesAPI);
+    yield put({
+      type: LOAD_MY_MOVIES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_MY_MOVIES_FAILURE,
+      error: err.response.data,
     });
   }
 }
@@ -235,6 +258,9 @@ function* watchSearchMovie() {
 function* watchLoadMovieDetail() {
   yield takeLatest(LOAD_MOVIE_DETAIL_REQUEST, loadMovieDetail);
 }
+function* watchLoadMyMovies() {
+  yield takeLatest(LOAD_MY_MOVIES_REQUEST, loadMyMovies);
+}
 function* watchAddLike() {
   yield takeLatest(ADD_LIKE_REQUEST, addLike);
 }
@@ -260,6 +286,7 @@ export default function* movieSaga() {
     fork(watchLoadRecommendedMovies),
     fork(watchSearchMovie),
     fork(watchLoadMovieDetail),
+    fork(watchLoadMyMovies),
     fork(watchAddLike),
     fork(watchRemoveLike),
     fork(watchAddReview),

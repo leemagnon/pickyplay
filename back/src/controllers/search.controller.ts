@@ -9,6 +9,8 @@ import reviewModel from 'src/models/review.model';
 import reviewImageModel from 'src/models/reviewImage.model';
 import userModel from 'src/models/user.model';
 import Sequelize from 'sequelize';
+import authMiddleware from 'src/middleware/auth.middleware';
+import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 
 class SearchController implements Controller {
   public path = '/search';
@@ -34,6 +36,7 @@ class SearchController implements Controller {
     this.router.get(`${this.path}/recommendedMovies`, this.getRecommendedMovies);
     this.router.get(`${this.path}/movie/:term`, this.searchMovies);
     this.router.get(`${this.path}/detail/:DOCID`, this.getDetailedMovieInfo);
+    this.router.get(`${this.path}/myMovies`, authMiddleware, this.getMyMovies);
   }
 
   private storeMovies = async (req: Request, res: Response, next: NextFunction) => {
@@ -206,7 +209,7 @@ class SearchController implements Controller {
         let result = await this.client.search(params1);
         const _id = result.hits.hits[0]._id;
         result = result.hits.hits[0]._source;
-        top10Movies.push(result);
+        top10Movies.push(result); //  이 부분 내일 수정??
 
         result._id = _id;
         result.posters = result.posters._cdata.trim().split('|')[0];
@@ -449,6 +452,78 @@ class SearchController implements Controller {
       result.likers = likers;
 
       res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  private getMyMovies = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    const myMovies = [];
+    try {
+      const likes = await this.like.findAll({ where: { userIdx: req.user.userIdx } });
+
+      for (const like of likes) {
+        const params = {
+          index: 'movies-1',
+          body: {
+            size: 1,
+            _source: [
+              'DOCID._cdata',
+              'posters._cdata',
+              'title._cdata',
+              'keywords._cdata',
+              'genre._cdata',
+              'actors.actor.actorNm._cdata',
+            ],
+            query: {
+              match: { 'DOCID._cdata': `${like.DOCID}` },
+            },
+          },
+        };
+
+        let result = await this.client.search(params);
+        const _id = result.hits.hits[0]._id;
+        result = result.hits.hits[0]._source;
+
+        result._id = _id;
+        result.posters = result.posters._cdata.trim().split('|')[0];
+        result.DOCID = result.DOCID._cdata.trim();
+        result.title = result.title._cdata.trim();
+        result.genre = result.genre._cdata.trim();
+
+        /**
+         * keywords(출연배우) 문자열 생성
+         */
+        const keywordArr = result.keywords._cdata.trim().split(',');
+
+        if (keywordArr.length > 5) {
+          result.keywords = `${keywordArr[0]}, ${keywordArr[1]}, ${keywordArr[2]}, ${keywordArr[3]}, ${keywordArr[4]}`;
+        } else {
+          result.keywords = keywordArr.toString();
+        }
+
+        /**
+         * actors(출연배우) 문자열 생성
+         */
+        const actorArr = [];
+        if (!Object.prototype.hasOwnProperty.call(result.actors.actor, 'actorNm')) {
+          for (const actor of result.actors.actor) {
+            actorArr.push(actor.actorNm._cdata.trim());
+          }
+        } else {
+          actorArr.push(result.actors.actor.actorNm._cdata.trim());
+        }
+
+        if (actorArr.length > 5) {
+          result.actors = `${actorArr[0]}, ${actorArr[1]}, ${actorArr[2]}`;
+        } else {
+          result.actors = actorArr.toString();
+        }
+
+        myMovies.push(result);
+      }
+      res.status(200).json(myMovies);
     } catch (error) {
       console.error(error);
       next(error);

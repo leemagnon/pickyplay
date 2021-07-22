@@ -28,14 +28,10 @@ const Title = styled.p`
 
 const Container = styled.div`
   flex: 6;
-
   display: flex;
   flex-wrap: wrap;
-
   justify-content: center;
-
   overflow-y: scroll;
-  
   padding: 5px 40px 40px 40px;
 `;
 

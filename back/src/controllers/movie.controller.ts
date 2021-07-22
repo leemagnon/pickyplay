@@ -6,14 +6,21 @@ import MovieService from 'src/services/movie.service';
 import { CreateLikeDto, RemoveLikeDto } from 'src/dtos/like.dto';
 import { CreateReviewDto, UpdateReviewData } from 'src/dtos/review.dto';
 import { S3Upload, uploadReviewImgs } from 'src/utils/imageUpload';
+import { Client } from 'elasticsearch';
 
 class MovieController implements Controller {
   public path = '/movie';
   public router = express.Router();
   private movieService = new MovieService();
   private upload = S3Upload('review');
+  public client;
 
   constructor() {
+    this.client = new Client({
+      host: process.env.ELASTIC_HOST,
+      log: 'trace',
+      apiVersion: '7.2',
+    });
     this.initializeRoutes();
   }
 
@@ -36,11 +43,69 @@ class MovieController implements Controller {
       userIdx: req.user.userIdx,
       DOCID: req.params.DOCID,
     };
+
+    const params = {
+      index: 'movies-1',
+      body: {
+        size: 1,
+        _source: [
+          'DOCID._cdata',
+          'posters._cdata',
+          'title._cdata',
+          'keywords._cdata',
+          'genre._cdata',
+          'actors.actor.actorNm._cdata',
+        ],
+        query: {
+          match: { 'DOCID._cdata': `${likeData.DOCID}` },
+        },
+      },
+    };
+
     try {
       const like = await this.movieService.addLike(likeData);
 
       if (like) {
-        res.status(200).send({ likeIdx: like.likeIdx, userIdx: like.userIdx });
+        let result = await this.client.search(params);
+        const _id = result.hits.hits[0]._id;
+        result = result.hits.hits[0]._source;
+
+        result._id = _id;
+        result.posters = result.posters._cdata.trim().split('|')[0];
+        result.DOCID = result.DOCID._cdata.trim();
+        result.title = result.title._cdata.trim();
+        result.genre = result.genre._cdata.trim();
+
+        /**
+         * keywords(출연배우) 문자열 생성
+         */
+        const keywordArr = result.keywords._cdata.trim().split(',');
+
+        if (keywordArr.length > 5) {
+          result.keywords = `${keywordArr[0]}, ${keywordArr[1]}, ${keywordArr[2]}, ${keywordArr[3]}, ${keywordArr[4]}`;
+        } else {
+          result.keywords = keywordArr.toString();
+        }
+
+        /**
+         * actors(출연배우) 문자열 생성
+         */
+        const actorArr = [];
+        if (!Object.prototype.hasOwnProperty.call(result.actors.actor, 'actorNm')) {
+          for (const actor of result.actors.actor) {
+            actorArr.push(actor.actorNm._cdata.trim());
+          }
+        } else {
+          actorArr.push(result.actors.actor.actorNm._cdata.trim());
+        }
+
+        if (actorArr.length > 5) {
+          result.actors = `${actorArr[0]}, ${actorArr[1]}, ${actorArr[2]}`;
+        } else {
+          result.actors = actorArr.toString();
+        }
+
+        res.status(200).send({ likeIdx: like.likeIdx, userIdx: like.userIdx, likedMovie: result });
       }
     } catch (error) {
       console.error(error);
@@ -57,7 +122,7 @@ class MovieController implements Controller {
       const result = await this.movieService.removeLike(likeData);
 
       if (result) {
-        res.status(200).send({ userIdx: likeData.userIdx });
+        res.status(200).send({ userIdx: likeData.userIdx, DOCID: likeData.DOCID });
       }
     } catch (error) {
       console.error(error);

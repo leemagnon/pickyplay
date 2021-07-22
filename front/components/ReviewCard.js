@@ -50,7 +50,7 @@ const ReviewCard = ({ reviews }) => {
 
   return (
     <div>
-      {reviews.map((v) => (
+      {reviews?.map((v) => (
         <div key={v.reviewIdx} style={{ marginBottom: 20 }}>
           <Card
             cover={v.images[0] && <ReviewImages images={v.images} />}
