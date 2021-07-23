@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,11 +52,20 @@ const ReviewForm = ({ DOCID }) => {
   }, [imageInput.current]);
 
   const onChangeImages = useCallback((e) => {
+    const maxSize = 3000; // 3000KB = 5MB
+    let sum = 0;
+    for (const f of e.target.files) {
+      sum += f.size;
+      if (sum > maxSize) return alert('사진은 최대 3MB까지 업로드 할 수 있습니다.');
+    }
+    if (e.target.files.length > 3) {
+      return alert('사진은 최대 3장까지 업로드 할 수 있습니다.');
+    }
     const imageFormData = new FormData();
     [].forEach.call(e.target.files, (f) => {
       imageFormData.append('reviewImgs', f);
     });
-    dispatch({
+    return dispatch({
       type: UPLOAD_REVIEW_IMAGES_REQUEST,
       data: imageFormData,
     });
