@@ -29,6 +29,9 @@ const ReviewForm = ({ DOCID }) => {
   }, [text]);
 
   const onSubmit = useCallback(() => {
+    if (!me) {
+      return alert('로그인이 필요합니다.');
+    }
     if (!text || !text.trim()) {
       return alert('게시글을 작성하세요.');
     }
@@ -52,14 +55,14 @@ const ReviewForm = ({ DOCID }) => {
   }, [imageInput.current]);
 
   const onChangeImages = useCallback((e) => {
-    const maxSize = 3000; // 3000KB = 5MB
+    if (e.target.files.length > 3) {
+      return alert('사진은 최대 3장까지 업로드 할 수 있습니다.');
+    }
+    const maxSize = 5000000; // 5000KB = 5MB
     let sum = 0;
     for (const f of e.target.files) {
       sum += f.size;
-      if (sum > maxSize) return alert('사진은 최대 3MB까지 업로드 할 수 있습니다.');
-    }
-    if (e.target.files.length > 3) {
-      return alert('사진은 최대 3장까지 업로드 할 수 있습니다.');
+      if (sum > maxSize) return alert('사진은 최대 5MB까지 업로드 할 수 있습니다.');
     }
     const imageFormData = new FormData();
     [].forEach.call(e.target.files, (f) => {

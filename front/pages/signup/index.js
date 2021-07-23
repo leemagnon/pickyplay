@@ -318,7 +318,7 @@ const Signup = () => {
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
       <Background>
-        <Logo className="font-carter-one">
+        <Logo className="font-carter-one" onClick={() => Router.replace('/')}>
           <span>P</span>
           ICKY
           <span>P</span>
