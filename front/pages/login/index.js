@@ -13,8 +13,9 @@ import OTPForm from '../../components/OTPForm';
 
 /** css */
 const Background = styled.div`
-  overflow: hidden;
-  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden scroll;
   background-image: url('/login_bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
@@ -35,11 +36,11 @@ const Logo = styled.h1`
   & span {
     color: #9400d3;
   }
+  cursor: pointer;
 `;
 
 const LogInBody = styled.div`
   margin: auto;
-  margin-bottom: 50px;
   width: ${({ browserWidth }) => (browserWidth >= 510 ? 460 : browserWidth - 20)}px;
   padding: 30px ${({ browserWidth }) => (browserWidth >= 510 ? 65 : 30)}px;
   background-color: rgba(0, 0, 0, 0.75);
@@ -117,6 +118,7 @@ const SignUp = styled.div`
 `;
 
 const Footer = styled.div`
+  margin-top: 60px;
   padding: 20px 40px;
   background-color: rgba(0, 0, 0, 0.75);
   color: #737373;
@@ -207,7 +209,7 @@ const LogIn = () => {
   return (
     <Background>
       <Header>
-        <Logo className="font-carter-one">
+        <Logo className="font-carter-one" onClick={() => Router.replace('/')}>
           <span>P</span>
           ICKY
           <span>P</span>

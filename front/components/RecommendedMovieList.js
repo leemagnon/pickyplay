@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import Slider from 'react-slick';
@@ -8,6 +8,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import styled from 'styled-components';
 import ReactTooltip from 'react-tooltip';
 import { LOAD_MOVIE_DETAIL_REQUEST } from '../reducers/movie';
+import AppContext from '../contexts/appContext';
 
 const PosterCards = styled.div`
     margin: 0 auto;
@@ -45,11 +46,17 @@ const PosterCard = styled.img`
     }
 `;
 
+const Label = styled.label`
+  color: white; 
+  font-size: ${({ browserWidth }) => (browserWidth > 450 ? 30 : 24)}px;
+  margin-left: 10px;
+`;
+
 const RecommendedMovieList = ({ recommendedMovies }) => {
   const dispatch = useDispatch();
+  const browserSize = useContext(AppContext);
   const [recommendedMoviesHover, setRecommendedMoviesHover] = useState(false);
   const [randomMoviesHover, setRandomMoviesHover] = useState(false);
-
   const [isTooltipVisible, setTooltipVisibility] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
@@ -166,7 +173,7 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <PosterCards>
-        <label style={{ color: 'white', fontSize: '30px', marginLeft: '10px' }}>오늘 PICKYPLAY의 TOP 10 콘텐츠</label>
+        <Label browserWidth={browserSize.browserWidth}>오늘 PICKYPLAY의 TOP 10 콘텐츠</Label>
         <div ref={recommendedMoviesReference} style={{ marginTop: '10px' }}>
           <Slider key={isClient ? 'client' : 'server'} {...recommendedMoviesSettings}>
             {recommendedMovies
@@ -185,7 +192,9 @@ const RecommendedMovieList = ({ recommendedMovies }) => {
         </div>
       </PosterCards>
       <PosterCards>
-        <label style={{ color: 'white', fontSize: '30px', marginLeft: '10px' }}>추천 콘텐츠 ( {recommendedMovies.randomGenre} )</label>
+        <Label browserWidth={browserSize.browserWidth}>
+          추천 콘텐츠 ( {recommendedMovies.randomGenre} )
+        </Label>
         <div ref={randomMoviesReference} style={{ marginTop: '10px' }}>
           <Slider key={isClient ? 'client' : 'server'} {...randomMoviesSettings}>
             {recommendedMovies

@@ -44,7 +44,7 @@ class App {
       this.app.use(helmet());
       this.app.use(
         cors({
-          origin: 'http://pickyplay.site',
+          origin: 'https://pickyplay.site',
           credentials: true,
         }),
       );

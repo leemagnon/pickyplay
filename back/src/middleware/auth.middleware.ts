@@ -5,8 +5,6 @@ import WrongAuthenticationTokenException from 'src/exceptions/WrongAuthenticatio
 import DataStoredInToken from 'src/interfaces/dataStoredInToken.interface';
 import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 import userModel from 'src/models/user.model';
-import likeModel from 'src/models/like.model';
-import reviewModel from 'src/models/review.model';
 
 async function authMiddleware(req: RequestWithUser, res: Response, next: NextFunction) {
   const cookies = req.cookies;

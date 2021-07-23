@@ -116,7 +116,7 @@ class AuthenticationController implements Controller {
   private loggingOut = (req: Request, res: Response, next: NextFunction) => {
     try {
       if (process.env.NODE_ENV === 'production') {
-        res.setHeader('Set-Cookie', ['Authorization=deleted;HttpOnly;Path=/;Max-Age=0;Domain=.pickyplay.site']);
+        res.setHeader('Set-Cookie', ['Authorization=deleted;Secure;HttpOnly;Path=/;Max-Age=0;Domain=.pickyplay.site']);
       } else {
         res.setHeader('Set-Cookie', ['Authorization=deleted;HttpOnly;Path=/;Max-Age=0']);
       }

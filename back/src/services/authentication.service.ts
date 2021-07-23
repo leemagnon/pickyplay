@@ -73,9 +73,7 @@ class AuthenticationService {
   public async loggingIn(logInData: LogInDto) {
     const user = await this.user.findOne({ where: { email: logInData.email } });
     if (user) {
-      console.log(logInData.password, user.password);
       const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
-      console.log('isPasswordMatching : ', isPasswordMatching);
       if (isPasswordMatching) {
         const result = !user.twoFactorAuthenticationCode ? user : 'Activate 2FA';
         return result;
@@ -104,7 +102,7 @@ class AuthenticationService {
 
   public createCookie(tokenData: TokenData) {
     if (process.env.NODE_ENV === 'production') {
-      return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}; Domain=.pickyplay.site`;
+      return `Authorization=${tokenData.token}; HttpOnly; Secure; Path=/; Max-Age=${tokenData.expiresIn}; Domain=.pickyplay.site`;
     } else {
       return `Authorization=${tokenData.token}; HttpOnly; Path=/; Max-Age=${tokenData.expiresIn}`;
     }

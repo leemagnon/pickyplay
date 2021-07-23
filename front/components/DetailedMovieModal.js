@@ -34,7 +34,7 @@ const Title = styled.div`
 
 const DetailInfo = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: ${({ browserWidth }) => (browserWidth > 500 ? 'row' : 'column')};
   color: white;
   margin-bottom: 30px;
 
@@ -49,6 +49,21 @@ const DetailInfo = styled.div`
       text-decoration: underline;
     }
   }
+`;
+
+const InfoOne = styled.div`
+  flex: 2.5;
+  padding: 0 30px;
+  #plot {
+    font-size: ${({ browserWidth }) => (browserWidth > 500 ? 20 : 18)}px;
+  }
+`;
+
+const InfoTwo = styled.div`
+  flex: 1;
+  font-size: 17px;
+  padding: ${({ browserWidth }) => (browserWidth > 500 ? '0 10px' : '0 30px')};
+  margin-top: 30px;
 `;
 
 const CloseModalButton = styled.button`
@@ -146,12 +161,12 @@ const DetailedMovieModal = ({ data, onCloseModal }) => {
             </Slider>
           )
 }
-      <DetailInfo>
-        <div style={{ flex: 2.5, padding: '0 30px' }}>
+      <DetailInfo browserWidth={browserSize.browserWidth}>
+        <InfoOne browserWidth={browserSize.browserWidth}>
           <div style={{ fontSize: '18px', marginBottom: '5px' }}>{data.prodYear} | {data.rating} | {data.runtime}</div>
-          <div style={{ fontSize: '20px' }}>{data.plots}</div>
-        </div>
-        <div style={{ flex: 1, padding: '0 10px', fontSize: '17px' }}>
+          <div id="plot">{data.plots}</div>
+        </InfoOne>
+        <InfoTwo browserWidth={browserSize.browserWidth}>
           <div><span id="info">출연:</span> {data.actors[0]}, {data.actors[1]}, {data.actors[2]}, <span id="more" onClick={onClickMoreActors}>더 보기</span></div>
           <div><span id="info">장르:</span> {data.genre}</div>
           <div><span id="info">키워드:</span> {data.keywords}</div>
@@ -160,11 +175,10 @@ const DetailedMovieModal = ({ data, onCloseModal }) => {
               ? <HeartFilled key="heart" style={{ fontSize: '100px', color: 'red' }} onClick={() => onUnlike(data.DOCID)} />
               : <HeartOutlined key="heart" style={{ fontSize: '100px' }} onClick={() => onLike(data.DOCID)} />}
           </div>
-        </div>
+        </InfoTwo>
       </DetailInfo>
       <ReviewForm DOCID={data.DOCID} />
       <ReviewCard reviews={reviews} />
-
       <Modal visible={showMoreActorModal}>
         <div style={{ textAlign: 'center', padding: '30px 40px', background: 'white' }}>
           <CloseMoreActorModalButton
