@@ -17,4 +17,15 @@ export class UpdateReviewData {
 
   @IsString()
   public content: string;
+
+  @IsNumber()
+  public userIdx: number;
+}
+
+export class RemoveReviewData {
+  @IsNumber()
+  public reviewIdx: number;
+
+  @IsNumber()
+  public userIdx: number;
 }

@@ -4,7 +4,7 @@ import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 import authMiddleware from 'src/middleware/auth.middleware';
 import MovieService from 'src/services/movie.service';
 import { CreateLikeDto, RemoveLikeDto } from 'src/dtos/like.dto';
-import { CreateReviewDto, UpdateReviewData } from 'src/dtos/review.dto';
+import { CreateReviewDto, UpdateReviewData, RemoveReviewData } from 'src/dtos/review.dto';
 import { S3Upload, uploadReviewImgs } from 'src/utils/imageUpload';
 import { Client } from 'elasticsearch';
 
@@ -152,7 +152,11 @@ class MovieController implements Controller {
   };
 
   private removeReview = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-    const reviewData: number = parseInt(req.params.reviewIdx);
+    const reviewData: RemoveReviewData = {
+      reviewIdx: parseInt(req.params.reviewIdx),
+      userIdx: req.user.userIdx,
+    };
+
     try {
       const result = await this.movieService.removeReview(reviewData);
 
@@ -169,6 +173,7 @@ class MovieController implements Controller {
     const reviewData: UpdateReviewData = {
       reviewIdx: req.body.reviewIdx,
       content: req.body.content,
+      userIdx: req.user.userIdx,
     };
     try {
       const result = await this.movieService.updateReview(reviewData);

@@ -1,5 +1,5 @@
 import { CreateLikeDto, RemoveLikeDto } from 'src/dtos/like.dto';
-import { CreateReviewDto, UpdateReviewData } from 'src/dtos/review.dto';
+import { CreateReviewDto, UpdateReviewData, RemoveReviewData } from 'src/dtos/review.dto';
 import likeModel from 'src/models/like.model';
 import reviewModel from 'src/models/review.model';
 import reviewImageModel from 'src/models/reviewImage.model';
@@ -72,10 +72,10 @@ class MovieService {
     }
   }
 
-  public async removeReview(reviewIdx: number) {
+  public async removeReview(reviewData: RemoveReviewData) {
     try {
-      await this.reviewImage.destroy({ where: { reviewIdx } });
-      await this.review.destroy({ where: { reviewIdx } });
+      await this.reviewImage.destroy({ where: { reviewIdx: reviewData.reviewIdx, userIdx: reviewData.userIdx } });
+      await this.review.destroy({ where: { reviewIdx: reviewData.reviewIdx, userIdx: reviewData.userIdx } });
 
       return 'deleted successfully';
     } catch (error) {
@@ -86,7 +86,10 @@ class MovieService {
 
   public async updateReview(reviewData: UpdateReviewData) {
     try {
-      await this.review.update({ content: reviewData.content }, { where: { reviewIdx: reviewData.reviewIdx } });
+      await this.review.update(
+        { content: reviewData.content },
+        { where: { reviewIdx: reviewData.reviewIdx, userIdx: reviewData.userIdx } },
+      );
 
       return 'updated successfully';
     } catch (error) {
