@@ -161,7 +161,7 @@ class MovieController implements Controller {
       const result = await this.movieService.removeReview(reviewData);
 
       if (result) {
-        res.status(200).send({ reviewIdx: reviewData });
+        res.status(200).send({ reviewIdx: reviewData.reviewIdx });
       }
     } catch (error) {
       console.error(error);

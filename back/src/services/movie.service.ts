@@ -74,7 +74,7 @@ class MovieService {
 
   public async removeReview(reviewData: RemoveReviewData) {
     try {
-      await this.reviewImage.destroy({ where: { reviewIdx: reviewData.reviewIdx, userIdx: reviewData.userIdx } });
+      await this.reviewImage.destroy({ where: { reviewIdx: reviewData.reviewIdx } });
       await this.review.destroy({ where: { reviewIdx: reviewData.reviewIdx, userIdx: reviewData.userIdx } });
 
       return 'deleted successfully';

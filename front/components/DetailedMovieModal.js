@@ -178,7 +178,7 @@ const DetailedMovieModal = ({ data, onCloseModal }) => {
         </InfoTwo>
       </DetailInfo>
       <ReviewForm DOCID={data.DOCID} />
-      <ReviewCard reviews={reviews} />
+      {reviews.map((review) => <ReviewCard key={review.reviewIdx} review={review} />)}
       <Modal visible={showMoreActorModal}>
         <div style={{ textAlign: 'center', padding: '30px 40px', background: 'white' }}>
           <CloseMoreActorModalButton

@@ -14,7 +14,7 @@ import {
 
 moment.locale('ko');
 
-const ReviewCard = ({ reviews }) => {
+const ReviewCard = ({ review }) => {
   const dispatch = useDispatch();
   const { removeReviewLoading } = useSelector((state) => state.movie);
   const userIdx = useSelector((state) => state.user.me?.userIdx);
@@ -49,50 +49,46 @@ const ReviewCard = ({ reviews }) => {
   }, [userIdx]);
 
   return (
-    <div>
-      {reviews?.map((v) => (
-        <div key={v.reviewIdx} style={{ marginBottom: 20 }}>
-          <Card
-            cover={v.images[0] && <ReviewImages images={v.images} />}
-            extra={userIdx && userIdx === v.user.userIdx && (
-            <Popover
-              key="more"
-              content={(
-                <Button.Group>
-                  <Button onClick={onClickUpdate}>수정</Button>
-                  <Button type="danger" loading={removeReviewLoading} onClick={() => onRemoveReview(v.reviewIdx)}>삭제</Button>
-                </Button.Group>
+    <div style={{ marginBottom: 20 }}>
+      <Card
+        cover={review.images[0] && <ReviewImages images={review.images} />}
+        extra={userIdx && userIdx === review.userIdx && (
+        <Popover
+          key="more"
+          content={(
+            <Button.Group>
+              <Button onClick={onClickUpdate}>수정</Button>
+              <Button type="danger" loading={removeReviewLoading} onClick={() => onRemoveReview(review.reviewIdx)}>삭제</Button>
+            </Button.Group>
         )}
-            >
-              <EllipsisOutlined />
-            </Popover>
-            )}
-          >
-            <>
-              <div style={{ float: 'right' }}>{moment(v.createdAt).format('YYYY.MM.DD')}</div>
-              <Card.Meta
-                avatar={<Avatar src={v.user.profileImgUrl || gravatar.url(v.user.email, { s: '38px', d: 'retro' })} />}
-                title={v.user.nickname}
-                description={(
-                  <ReviewCardContent
-                    reviewIdx={v.reviewIdx}
-                    reviewData={v.content}
-                    editMode={editMode}
-                    onChangeReview={onChangeReview}
-                    onCancelUpdate={onCancelUpdate}
-                  />
-          )}
+        >
+          <EllipsisOutlined />
+        </Popover>
+        )}
+      >
+        <>
+          <div style={{ float: 'right' }}>{moment(review.createdAt).format('YYYY.MM.DD')}</div>
+          <Card.Meta
+            avatar={<Avatar src={review.user.profileImgUrl || gravatar.url(review.user.email, { s: '38px', d: 'retro' })} />}
+            title={review.user.nickname}
+            description={(
+              <ReviewCardContent
+                reviewIdx={review.reviewIdx}
+                reviewData={review.content}
+                editMode={editMode}
+                onChangeReview={onChangeReview}
+                onCancelUpdate={onCancelUpdate}
               />
-            </>
-          </Card>
-        </div>
-      ))}
+          )}
+          />
+        </>
+      </Card>
     </div>
   );
 };
 
 ReviewCard.propTypes = {
-  reviews: PropTypes.arrayOf(PropTypes.shape({
+  review: PropTypes.shape({
     reviewIdx: PropTypes.number,
     userIdx: PropTypes.number,
     DOCID: PropTypes.string,
@@ -100,7 +96,7 @@ ReviewCard.propTypes = {
     createdAt: PropTypes.string,
     user: PropTypes.object,
     images: PropTypes.arrayOf(PropTypes.object),
-  })).isRequired,
+  }).isRequired,
 };
 
 export default ReviewCard;

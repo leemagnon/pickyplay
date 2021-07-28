@@ -58,12 +58,12 @@ class SearchController implements Controller {
 
       for (const movie of movies) {
         await this.client.index({
-          index: 'movies-1',
+          index: 'movies-2',
           body: movie,
         });
       }
 
-      res.send(movies);
+      // res.send(movies);
     } catch (error) {
       console.error(error);
       next(error);

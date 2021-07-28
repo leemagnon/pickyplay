@@ -13,13 +13,10 @@ import { emailRule, nicknameRule, passwordRule } from '../../util/regexp';
 /** css */
 const Background = styled.div`
   flex: 1;
-
   display: flex;
   flex-direction: column;
   align-items:center;
-
   overflow-y: scroll;
-
   background-color: #1d2327;
 `;
 
