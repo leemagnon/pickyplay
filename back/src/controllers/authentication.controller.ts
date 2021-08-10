@@ -8,7 +8,6 @@ import AuthenticationService from 'src/services/authentication.service';
 import UserService from 'src/services/user.service';
 import RequestWithUser from 'src/interfaces/requestWithUser.interface';
 import authMiddleware from 'src/middleware/auth.middleware';
-import randomBytes from 'randombytes';
 import WrongOTPException from 'src/exceptions/WrongOTPException';
 
 class AuthenticationController implements Controller {
@@ -52,11 +51,14 @@ class AuthenticationController implements Controller {
   };
 
   private getEmailAuthCode = async (req: Request, res: Response, next: NextFunction) => {
-    const hexKey = randomBytes(256).toString('hex').substr(100, 5);
-    const base64Key = randomBytes(256).toString('base64').substr(50, 5);
+    let emailAuthCode = '';
+    for (let i = 0; i < 6; i++) {
+      const ranNum = Math.floor(Math.random() * 9) + 1;
+      emailAuthCode = emailAuthCode.concat(ranNum.toString());
+    }
     const emailData: EmailDto = {
       receiverEmail: req.body.email,
-      emailAuthCode: hexKey + base64Key,
+      emailAuthCode,
     };
 
     try {

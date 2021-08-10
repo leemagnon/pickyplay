@@ -151,7 +151,7 @@ const Signup = () => {
       const result = await axios.post('/auth/emailAuthCode', {
         email,
       });
-      setEmailAuthCode(result.data);
+      setEmailAuthCode(result.data.toString());
       alert(`${email}로 인증코드가 전송되었습니다.`);
     },
     [email, emailRequiredError, emailValidationError],

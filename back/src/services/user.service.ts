@@ -1,5 +1,4 @@
 import userModel from 'src/models/user.model';
-import likeModel from 'src/models/like.model';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import User from 'src/interfaces/user.interface';

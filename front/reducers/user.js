@@ -1,7 +1,6 @@
 import produce from 'immer';
 
 export const initialState = {
-  emailAuthCode: '',
   secondAuthLoading: false, // 2FA 시도중
   secondAuthDone: false,
   secondAuthError: null,
